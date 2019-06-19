@@ -1,0 +1,17 @@
+## Operating Systems ##
+Thumbs.db
+*.DS_Store
+
+## Package Management ##
+/composer.phar
+/vendor/
+/node_modules/
+
+## IDEs ##
+/.idea/
+/nbproject
+
+## Config/Logs ##
+/.env
+*.log
+.phpunit.result.cache

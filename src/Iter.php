@@ -1,0 +1,878 @@
+<?php declare(strict_types=1);
+
+namespace Jeremeamia\Iter8;
+
+use InvalidArgumentException;
+use Iterator;
+
+use function array_values, count, is_array, is_iterable, iterator_to_array;
+
+/**
+ * Iter is a helper that provides operations for iterables where the end result is always a new Generator.
+ *
+ * Iter includes mapping operations, filtering operations, restructuring operations, and a few misc. operations. All
+ * included operations are pipe-able.
+ */
+final class Iter
+{
+    public const PRESERVE_KEYS = true;
+
+    //------------------------------------------------------------------------------------------------------------------
+    // MAPPING OPERATIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns a new iterable with items mapped from the source by the mapper function.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Mapper function for values.
+     * @return Iterator
+     */
+    public static function map(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            yield $key => $fn($value, $key);
+        }
+    }
+
+    /**
+     * Returns a new iterable where the keys are replaced by applying the mapper function to the source keys.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Mapper function for keys.
+     * @return Iterator
+     */
+    public static function mapKeys(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            yield $fn($key, $value) => $value;
+        }
+    }
+
+    /**
+     * Returns a new iterable where the keys are replaced by applying the mapper function to the source values.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Mapper function for values.
+     * @return Iterator
+     */
+    public static function reindex(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            yield $fn($value, $key) => $value;
+        }
+    }
+
+    /**
+     * Returns a new iterable with items mapped from the source by plucking a key.
+     *
+     * @param iterable $iter Source data.
+     * @param string $key Key to pluck from each item.
+     * @return Iterator
+     */
+    public static function pluck(iterable $iter, string $key): Iterator
+    {
+        return self::map($iter, Func::index($key));
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function toKeyPairs(iterable $iter): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            yield [$key, $value];
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function fromKeyPairs(iterable $iter): Iterator
+    {
+        foreach ($iter as [$key, $value]) {
+            yield $key => $value;
+        }
+    }
+
+    /**
+     * Returns a new iterable that ignores values and takes only the keys from the source.
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function keys(iterable $iter): Iterator
+    {
+        foreach ($iter as $key => $_) {
+            yield $key;
+        }
+    }
+
+    /**
+     * Returns a new iterable that ignores keys and takes only the values from the source.
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function values(iterable $iter): Iterator
+    {
+        foreach ($iter as $value) {
+            yield $value;
+        }
+    }
+
+    /**
+     * Returns a new iterable that flips the keys and arrays (like array_flip).
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function flip(iterable $iter): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            yield $value => $key;
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // FILTERING OPERATIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns a new iterable with items filtered out from the source by the filter function.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Filter function (i.e., predicate).
+     * @return Iterator
+     */
+    public static function filter(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            if ($fn($value, $key)) {
+                yield $key => $value;
+            }
+        }
+    }
+
+    /**
+     * Returns a new iterable with items filtered out from the source by applying the filter function to the keys.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Filter function (i.e., predicate).
+     * @return Iterator
+     */
+    public static function filterKeys(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            if ($fn($key)) {
+                yield $key => $value;
+            }
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function filterNulls(iterable $iter): Iterator
+    {
+        return self::filter($iter, Func::not('is_null'));
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function filterEmpty(iterable $iter): Iterator
+    {
+        return self::filter($iter, Func::truthy());
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param string $key
+     * @param mixed $value
+     * @return Iterator
+     */
+    public static function where(iterable $iter, string $key, $value): Iterator
+    {
+        return self::filter($iter, function ($array) use ($key, $value) {
+            return array_key_exists($key, $array) && $array[$key] === $value;
+        });
+    }
+
+    /**
+     * Returns a new iterable that takes only the first $n items from the source.
+     *
+     * @param iterable $iter Source data.
+     * @param int $n Number of items to take.
+     * @return Iterator
+     */
+    public static function take(iterable $iter, int $n): Iterator
+    {
+        return self::slice($iter, 0, $n);
+    }
+
+    /**
+     * Returns a new iterable that takes only items from the source after the first $n items are skipped.
+     *
+     * @param iterable $iter Source data.
+     * @param int $n Number of items to drop/skip.
+     * @return Iterator
+     */
+    public static function drop(iterable $iter, int $n): Iterator
+    {
+        return self::slice($iter, $n);
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param int $offset
+     * @param int|null $length
+     * @return Iterator
+     */
+    public static function slice(iterable $iter, int $offset, ?int $length = null): Iterator
+    {
+        if ($offset < 0) {
+            throw new InvalidArgumentException('Starting offset must be non-negative');
+        }
+
+        if ($length < 0) {
+            throw new InvalidArgumentException('Length must be non-negative');
+        }
+
+        if ($length === 0) {
+            return;
+        }
+
+        $i = 0;
+        foreach ($iter as $key => $value) {
+            // Skip everything before the offset.
+            if ($i++ < $offset) {
+                continue;
+            }
+
+            yield $key => $value;
+
+            // Skip everything once the length is reached.
+            if ($length && $i >= $offset + $length) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Returns a new iterable that takes the first items from the source until the predicate function returns false.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn predicate function.
+     * @return Iterator
+     */
+    public static function takeWhile(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            if (!$fn($value, $key)) {
+                return;
+            }
+
+            yield $key => $value;
+        }
+    }
+
+    /**
+     * Returns a new iterable that drops the first items from the source until the predicate function returns false.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn predicate function.
+     * @return Iterator
+     */
+    public static function dropWhile(iterable $iter, callable $fn): Iterator
+    {
+        $iter = Iter::toIter($iter);
+        foreach ($iter as $key => $value) {
+            if (!$fn($value, $key)) {
+                break;
+            }
+        }
+
+        yield from self::resume($iter);
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function debounce(iterable $iter): Iterator
+    {
+        $prev = null;
+        foreach ($iter as $key => $value) {
+            if ($value !== $prev) {
+                yield $key => $value;
+                $prev = $value;
+            }
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function distinct(iterable $iter): Iterator
+    {
+        $prev = [];
+        foreach ($iter as $key => $value) {
+            if (!in_array($value, $prev, true)) {
+                yield $key => $value;
+                $prev[] = $value;
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // RESTRUCTURING OPERATIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns a new iterable of arrays of size $size that are groups of items from the source.
+     *
+     * @param iterable $iter Source data.
+     * @param int $size The desired buffer size.
+     * @return Iterator
+     */
+    public static function buffer(iterable $iter, int $size): Iterator
+    {
+        $buffer = [];
+        foreach ($iter as $item) {
+            $buffer[] = $item;
+            if (count($buffer) === $size) {
+                yield $buffer;
+                $buffer = [];
+            }
+        }
+
+        if (count($buffer) > 0) {
+            yield $buffer;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param int $count The desired number of $partitions.
+     * @return Iterator
+     */
+    public static function partition(iterable $iter, int $count): Iterator
+    {
+        $partitions = [];
+
+        $i = 0;
+        foreach ($iter as $value) {
+            $partitions[$i % $count][] = $value;
+            $i++;
+        }
+
+        foreach ($partitions as $partition) {
+            yield $partition;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param iterable ...$iters Additional iterables of source data.
+     * @return Iterator
+     */
+    public static function concat(iterable $iter, iterable ...$iters): Iterator
+    {
+        yield from $iter;
+        foreach ($iters as $iter) {
+            yield from $iter;
+        }
+    }
+
+    /**
+     * Returns a new iterable where a mapper function is applied that produces iterables that get flattened back up.
+     *
+     * @param iterable $iter Source data. Assumed to be an iterable of iterables.
+     * @param callable $fn Mapping function.
+     * @return Iterator
+     */
+    public static function flatMap(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $value) {
+            yield from $fn($value);
+        }
+    }
+
+    /**
+     * Flattens nested iterables in the source iterable down into a new iterable.
+     *
+     * @param iterable $iter Source data. Assumes that some items may also be iterable.
+     * @param int $levels The number of levels to recurse.
+     * @return Iterator
+     */
+    public static function flatten(iterable $iter, int $levels = 1): Iterator
+    {
+        if ($levels < 0) {
+            throw new InvalidArgumentException('Levels must be non-negative');
+        } elseif ($levels === 0) {
+            yield from $iter;
+        } else {
+            foreach ($iter as $value) {
+                if (is_iterable($value)) {
+                    yield from self::flatten($value, $levels - 1);
+                } else {
+                    yield $value;
+                }
+            }
+        }
+    }
+
+    /**
+     * Flattens all the leaves recursively in a tree-structured source iterable down into a new iterable.
+     *
+     * @param iterable $iter Source data. Assumes that some items (included deeply nested ones) may also be iterable.
+     * @return Iterator
+     */
+    public static function leaves(iterable $iter): Iterator
+    {
+        foreach ($iter as $value) {
+            if (is_iterable($value)) {
+                yield from self::leaves($value);
+            } else {
+                yield $value;
+            }
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param iterable ...$iters
+     * @return Iterator
+     */
+    public static function zip(iterable $iter, iterable ...$iters): Iterator
+    {
+        array_unshift($iters, $iter);
+        $iters = array_map([self::class, 'toIter'], $iters);
+
+        for (
+            self::apply($iters, Func::method('rewind'));
+            self::all($iters, Func::method('valid'));
+            self::apply($iters, Func::method('next'))
+        ) {
+            yield array_map(Func::method('current'), $iters);
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param mixed $separator
+     * @return Iterator
+     */
+    public static function interpose(iterable $iter, $separator): Iterator
+    {
+        $iter = self::toIter($iter);
+        yield from self::take($iter, 1);
+        foreach (self::resume($iter) as $value) {
+            yield $separator;
+            yield $value;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * Note: The length of the resulting Iterator will be the minimum length of the two input iterables.
+     *
+     * @param iterable $iter Source data.
+     * @param iterable $keys Replacement keys.
+     * @return Iterator
+     */
+    public static function replaceKeys(iterable $iter, iterable $keys): Iterator
+    {
+        $iter = self::toIter($iter);
+        $keys = self::toIter($keys);
+        for (
+            $iter->rewind(), $keys->rewind();
+            $iter->valid() && $keys->valid();
+            $iter->next(), $keys->next()
+        ) {
+            yield $keys->current() => $iter->current();
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * Note: The length of the resulting Iterator will be the minimum length of the two input iterables.
+     *
+     * @param iterable $iter Source data.
+     * @param iterable $values Replacement $values.
+     * @return Iterator
+     */
+    public static function replaceValues(iterable $iter, iterable $values): Iterator
+    {
+        $iter = self::toIter($iter);
+        $values = self::toIter($values);
+        for (
+            $iter->rewind(), $values->rewind();
+            $iter->valid() && $values->valid();
+            $iter->next(), $values->next()
+        ) {
+            yield $iter->key() => $values->current();
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // MISC OPERATIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Adapts any iterable value to the Iterator interface.
+     *
+     * This allows Iterator decorators (like those in SPL) that work *only* with the Iterator interface to be used
+     * easily with any iterable value (e.g., array, IteratorAggregate).
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function normalize(iterable $iter): Iterator
+    {
+        yield from $iter;
+    }
+
+    /**
+     * Creates a new iterable where source data is piped through one or more transformative operations.
+     *
+     * Piping allows for the a more natural reading order of operations when multiple operations are being applied to an
+     * iterable. Instead of consecutive wrappings of iterables that result in an "inside-out" order of operations,
+     * piping allows the transformations to be written in the order they are performed.
+     *
+     * @param iterable $iter
+     * @param iterable|callable[] $operations
+     * @return Iterator
+     */
+    public static function pipe(iterable $iter, iterable $operations): Iterator
+    {
+        foreach ($operations as $operation) {
+            $iter = $operation($iter);
+        }
+
+        return $iter;
+    }
+
+    /**
+     * Creates a new iterable where the provided callback function is executed for each item during iteration.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Function to apply for each item.
+     * @return Iterator
+     */
+    public static function tap(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            $fn($value, $key);
+            yield $key => $value;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Predicate function.
+     * @return Iterator
+     * @throws \Exception
+     */
+    public static function validate(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            if ($fn($value)) {
+                yield $key => $value;
+            } else {
+                throw ValidationException::for($key);
+            }
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * aka "reductions"
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Reducer function.
+     * @param mixed|null $initialValue The initial carry value that values are reduced onto.
+     * @return mixed
+     */
+    public static function scan(iterable $iter, callable $fn, $initialValue = null): Iterator
+    {
+        $accumulator = $initialValue;
+        foreach ($iter as $key => $value) {
+            $accumulator = $fn($accumulator, $value, $key);
+            yield $accumulator;
+        }
+    }
+
+    /**
+     * Creates a new iterator that resumes from from a partially-consumed iterator without rewinding.
+     *
+     * @param Iterator $iter
+     * @return Iterator
+     */
+    public static function resume(Iterator $iter): Iterator
+    {
+        $iter->next();
+        while ($iter->valid()) {
+            yield $iter->key() => $iter->current();
+            $iter->next();
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Function to apply for each item.
+     * @param array $args
+     * @return void
+     */
+    public static function apply(iterable $iter, callable $fn, array $args = []): void
+    {
+        foreach ($iter as $key => $value) {
+            $fn($value, $key, ...$args);
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param resource $stream
+     * @return int
+     */
+    public static function streamTo(iterable $iter, &$stream): int
+    {
+        $bytes = 0;
+        foreach ($iter as $value) {
+            $bytes += fwrite($stream, (string) $value);
+        }
+
+        return $bytes;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // EVALUATION OPERATIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns a single value calculated by the provided reducer function being applied to all items from the source.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Reducer function.
+     * @param mixed|null $initialValue The initial carry value that values are reduced onto.
+     * @return mixed
+     */
+    public static function reduce(iterable $iter, callable $fn, $initialValue = null)#: mixed
+    {
+        return self::last(self::scan($iter, $fn, $initialValue));
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter
+     * @param string $separator
+     * @return string
+     */
+    public static function implode(iterable $iter, string $separator = ''): string
+    {
+        return self::toString(self::interpose($iter, $separator));
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn search function (i.e., predicate).
+     * @return mixed|null
+     */
+    public static function search(iterable $iter, callable $fn)#: ?mixed
+    {
+        return self::first(self::filter($iter, $fn));
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return mixed|null
+     */
+    public static function first(iterable $iter)#: ?mixed
+    {
+        return self::toArray(self::take($iter, 1))[0] ?? null;
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return mixed
+     */
+    public static function last(iterable $iter)#: mixed
+    {
+        $last = null;
+        foreach ($iter as $last);
+
+        return $last;
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Predicate function.
+     * @return bool
+     */
+    public static function any(iterable $iter, callable $fn): bool
+    {
+        foreach ($iter as $key => $value) {
+            if ($fn($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Predicate function.
+     * @return bool
+     */
+    public static function all(iterable $iter, callable $fn): bool
+    {
+        foreach ($iter as $key => $value) {
+            if (!$fn($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CONVERSION OPERATIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates an array from the source data. By default, the items are re-indexed.
+     *
+     * NOTE: This will not be needed with PHP 7.4+, since you can do: `$array = [...$iter];`
+     *
+     * @param iterable $iter Source data.
+     * @param bool $preserveKeys Set to true to keep the keys from the source. (Be careful with flattened data!)
+     * @return array
+     */
+    public static function toArray(iterable $iter, bool $preserveKeys = false): array
+    {
+        if (is_array($iter)) {
+            return $preserveKeys ? $iter : array_values($iter);
+        }
+
+        return iterator_to_array($iter, $preserveKeys);
+    }
+
+    /**
+     * Creates an Iterator from the source data.
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function toIter(iterable $iter): Iterator
+    {
+        return $iter instanceof Iterator ? $iter : self::normalize($iter);
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param bool $buffer
+     * @return string
+     */
+    public static function toString(iterable $iter, bool $buffer = false): string
+    {
+        if ($buffer) {
+            $buffer = self::toStream($iter);
+            $string = stream_get_contents($buffer);
+            fclose($buffer);
+            return $string;
+        }
+
+        return implode('', self::toArray($iter));
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return resource
+     */
+    public static function toStream(iterable $iter)#: resource
+    {
+        $stream = fopen('php://temp', 'w+');
+        self::streamTo($iter, $stream);
+        fseek($stream, 0);
+
+        return $stream;
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function rewindable(iterable $iter): Iterator
+    {
+        return RewindableIterator::new($iter);
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @return Iterator
+     */
+    public static function collection(iterable $iter): Iterator
+    {
+        return Collection::new($iter);
+    }
+}

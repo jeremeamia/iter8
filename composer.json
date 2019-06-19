@@ -1,0 +1,41 @@
+{
+  "name": "jeremeamia/iter8",
+  "type": "library",
+  "license": "MIT",
+  "config": {
+    "sort-packages": true
+  },
+  "require": {
+    "php": ">=7.2"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^0.11.0",
+    "phpunit/phpunit": "^8.0",
+    "squizlabs/php_codesniffer": "^3.4"
+  },
+  "autoload": {
+    "psr-4": { "Jeremeamia\\Iter8\\": "src/" }
+  },
+  "autoload-dev": {
+    "psr-4": { "Jeremeamia\\Iter8\\Tests\\": "tests/" }
+  },
+  "scripts": {
+    "ci": [ "@style-ci", "@test-ci", "@stan" ],
+    "docs-codesniffer": "open https://github.com/squizlabs/PHP_CodeSniffer/wiki",
+    "docs-composer": "open https://getcomposer.org/doc/",
+    "docs-phpunit": "open https://phpunit.readthedocs.io/en/latest/",
+    "docs-stan": "open https://github.com/phpstan/phpstan/blob/master/README.md",
+    "stan": "phpstan analyse --level=2 src tests",
+    "style-ci": "phpcs --standard=PSR12 -n src tests",
+    "style-fix": "phpcbf --standard=PSR12 src tests",
+    "style-lint": "phpcs --standard=PSR12 src tests",
+    "test": "phpunit --no-coverage ./tests",
+    "test-ci": "phpunit --coverage-text --log-junit build/reports/junit.xml ./tests",
+    "test-coverage": [
+      "phpunit --coverage-html build/coverage --testdox-html build/report/testdox.html ./tests",
+      "open build/coverage/index.html"
+    ],
+    "test-debug": "phpunit --no-coverage --debug",
+    "test-dox": "phpunit --no-coverage --testdox-text"
+  }
+}
