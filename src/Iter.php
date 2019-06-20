@@ -7,6 +7,8 @@ use Iterator;
 
 use function array_values, count, is_array, is_iterable, iterator_to_array;
 
+use const INF;
+
 /**
  * Iter is a helper that provides operations for iterables where the end result is always a new Generator.
  *
@@ -399,6 +401,23 @@ final class Iter
      * TODO
      *
      * @param iterable $iter Source data.
+     * @param int|null $times
+     * @return Iterator
+     */
+    public static function replay(iterable $iter, ?int $times = null): Iterator
+    {
+        $times = $times ?? INF;
+        $iter = self::rewindable($iter);
+        for ($i = 0; $i < $times; $i++) {
+            $iter->rewind();
+            yield from $iter;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
      * @param iterable ...$iters Additional iterables of source data.
      * @return Iterator
      */
@@ -407,6 +426,21 @@ final class Iter
         yield from $iter;
         foreach ($iters as $iter) {
             yield from $iter;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
+     * @param iterable ...$iters Additional iterables of source data.
+     * @return Iterator
+     */
+    public static function combineLatest(iterable $iter, iterable ...$iters): Iterator
+    {
+        yield self::last($iter);
+        foreach ($iters as $iter) {
+            yield self::last($iter);
         }
     }
 

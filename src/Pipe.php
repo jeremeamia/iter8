@@ -11,6 +11,7 @@ use Iterator;
  * @method static callable all(callable $fn) Get pipe-able all operation.
  * @method static callable buffer(int $size) Get pipe-able buffer operation.
  * @method static callable concat(iterable ...$iters) Get pipe-able concat operation.
+ * @method static callable combineLatest(iterable ...$iters) Get pipe-able combineLatest operation.
  * @method static callable debounce() Get pipe-able debounce operation.
  * @method static callable distinct() Get pipe-able distinct operation.
  * @method static callable drop(int $n) Get pipe-able drop operation.
@@ -35,9 +36,10 @@ use Iterator;
  * @method static callable pluck(string $key) Get pipe-able pluck operation.
  * @method static callable normalize() Get pipe-able pluck operation.
  * @method static callable reindex(callable $fn) Get pipe-able reindex operation.
- * @method static callable replaceKeys(iterable $keys) Get pipe-able replaceKeys operation.
  * @method static callable reduce(callable $fn, $initialValue = null) Get pipe-able reduce operation.
+ * @method static callable replaceKeys(iterable $keys) Get pipe-able replaceKeys operation.
  * @method static callable replaceValues(iterable $values) Get pipe-able replaceValues operation.
+ * @method static callable replay(?int $times = null) Get pipe-able replay operation.
  * @method static callable resume() Get pipe-able resume operation.
  * @method static callable scan(callable $fn, $initialValue = null) Get pipe-able scan operation.
  * @method static callable search(callable $fn) Get pipe-able search operation.
