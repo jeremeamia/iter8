@@ -27,7 +27,7 @@ final class Gen
      * @param int $end End of the integer range.
      * @param int $step The step/interval between numbers (Default: 1).
      * @return Iterator
-     * @see \range()
+     * @see range()
      */
     public static function range(int $start, int $end, int $step = 1): Iterator
     {
@@ -59,7 +59,7 @@ final class Gen
      * @param mixed $value Value to repeat.
      * @param int|null $times The number of times to repeat (Default: INF).
      * @return Iterator
-     * @see /array_fill()
+     * @see array_fill()
      */
     public static function repeat($value, ?int $times = null): Iterator
     {
@@ -80,7 +80,7 @@ final class Gen
      * @param iterable $keys Keys to use for iterable keys.
      * @param mixed $value Value to use for iterable values.
      * @return Iterator
-     * @see \array_fill_keys()
+     * @see array_fill_keys()
      */
     public static function repeatForKeys(iterable $keys, $value): Iterator
     {
@@ -156,8 +156,9 @@ final class Gen
     /**
      * Creates an iterable that contains the values exploded from the string.
      *
-     * Note: Uses explode() for small strings and strtok() for long strings.
-     * Note: Always uses explode when the delimiter is more than a single character.
+     * Notes:
+     * - Uses explode() for strings smaller than the threshold and strtok() for longer strings.
+     * - Always uses explode() when the delimiter is more than a single character.
      *
      * Example:
      *
@@ -168,8 +169,8 @@ final class Gen
      * @param string $delimiter Delimiter character(s) to explode on.
      * @param int $threshold The size limit before using strtok().
      * @return Iterator
-     * @see \explode()
-     * @see \strtok()
+     * @see explode()
+     * @see strtok()
      */
     public static function explode(string $source, string $delimiter, int $threshold = 1 * self::KB): Iterator
     {

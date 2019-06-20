@@ -27,6 +27,13 @@ final class Func
         };
     }
 
+    public static function unary(callable $fn): callable
+    {
+        return function (...$args) use ($fn) {
+            return $fn($args[0]);
+        };
+    }
+
     public static function truthy(): callable
     {
         return function ($value) {

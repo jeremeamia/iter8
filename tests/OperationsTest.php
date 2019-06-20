@@ -2,9 +2,7 @@
 
 namespace Jeremeamia\Iter8\Tests;
 
-use Jeremeamia\Iter8\{
-    Func, Iter, Pipe, Collection
-};
+use Jeremeamia\Iter8\{Func, Iter, Pipe, Collection};
 
 /**
  * @covers \Jeremeamia\Iter8\Iter
@@ -99,6 +97,22 @@ class IterTest extends TestCase
             Iter::toIter([1, 2, 3]),
             [Func::operator('*', 2)],
             [2, 4, 6]
+        ];
+
+        yield 'map (with keys)' => [
+            'map',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [Func::operator('*', 2)],
+            ['a' => 2, 'b' => 4, 'c' => 6],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'mapKeys' => [
+            'mapKeys',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [Func::unary('strtoupper')],
+            ['A' => 1, 'B' => 2, 'C' => 3],
+            Iter::PRESERVE_KEYS
         ];
 
         yield 'scan' => [
