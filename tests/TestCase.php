@@ -10,9 +10,14 @@ use PHPUnit\Framework\TestCase as PhpUnitTestCase;
  */
 abstract class TestCase extends PhpUnitTestCase
 {
-    protected function assertIterable(array $expected, iterable $iter, bool $preserveKeys = false)
+    protected function assertIterable(array $expected, iterable $iter, bool $preserveKeys = false): void
     {
         $actual = Iter::toArray($iter, $preserveKeys);
         $this->assertEquals($expected, $actual);
+    }
+
+    protected function consumeIterable(iterable $iter): void
+    {
+        foreach ($iter as $_);
     }
 }

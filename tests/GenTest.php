@@ -2,7 +2,6 @@
 
 namespace Jeremeamia\Iter8\Tests;
 
-use Exception;
 use InvalidArgumentException;
 use Jeremeamia\Iter8\{Gen, Iter};
 
@@ -11,120 +10,105 @@ use Jeremeamia\Iter8\{Gen, Iter};
  */
 class GenTest extends TestCase
 {
-    /**
-     * @param string $operation
-     * @param array $inputArgs
-     * @param array|Exception $expectedOutput
-     * @param bool $preserveKeys
-     * @dataProvider provideOperationTestCases
-     */
-    public function testGenOperations(
-        string $operation,
-        array $inputArgs,
-        array $expectedOutput,
-        bool $preserveKeys = false
-    ) {
-        $actualOutput = Gen::{$operation}(...$inputArgs);
-        $this->assertIterable($expectedOutput, $actualOutput, $preserveKeys);
+    public function testRangeWithNormalStep()
+    {
+        $iter = Gen::range(3, 7);
+        $this->assertIterable([3, 4, 5, 6, 7], $iter);
     }
 
-    public function provideOperationTestCases()
+    public function testRangeWithStepOf2()
     {
-        yield 'range (step: 1)' => [
-            'range',
-            [3, 7],
-            [3, 4, 5, 6, 7]
-        ];
+        $iter = Gen::range(3, 7, 2);
+        $this->assertIterable([3, 5, 7], $iter);
+    }
 
-        yield 'range (step: 2)' => [
-            'range',
-            [3, 7, 2],
-            [3, 5, 7]
-        ];
+    public function testRangeThatGoesBackwards()
+    {
+        $iter = Gen::range(7, 3);
+        $this->assertIterable([7, 6, 5, 4, 3], $iter);
+    }
 
-        yield 'range (negative)' => [
-            'range',
-            [5, 1],
-            [5, 4, 3, 2, 1]
-        ];
-
-        yield 'range (length: 0)' => [
-            'range',
-            [3, 3],
-            [3]
-        ];
-
-        yield 'repeat (length: 5)' => [
-            'repeat',
-            ['a', 3],
-            ['a', 'a', 'a']
-        ];
-
-        yield 'repeatForKeys' => [
-            'repeatForKeys',
-            [['a', 'b', 'c'], 2],
-            ['a' => 2, 'b' => 2, 'c' => 2],
-            true
-        ];
-
-        yield 'empty' => [
-            'empty',
-            [],
-            [],
-        ];
-
-        yield 'just (scalar)' => [
-            'just',
-            ['a'],
-            ['a'],
-        ];
-
-        yield 'just (iterable)' => [
-            'just',
-            [['a', 'b']],
-            [['a', 'b']],
-        ];
-
-        yield 'from (scalar)' => [
-            'from',
-            ['a'],
-            ['a'],
-        ];
-
-        yield 'from (iterable)' => [
-            'from',
-            [['a', 'b']],
-            ['a', 'b'],
-        ];
-
-        yield 'defer' => [
-            'defer',
-            [function () {return ['a', 'b', 'c'];}],
-            ['a', 'b', 'c'],
-        ];
-
-        yield 'explode (small)' => [
-            'explode',
-            ['a,b,c', ','],
-            ['a', 'b', 'c'],
-        ];
-
-        yield 'explode (multi-char delimiter)' => [
-            'explode',
-            ['a, b, c', ', '],
-            ['a', 'b', 'c'],
-        ];
-
-        yield 'explode (long)' => [
-            'explode',
-            ['a,b,c,d,e', ','],
-            ['a', 'b', 'c', 'd', 'e'],
-        ];
+    public function testRangeWithSameStartAndEnd()
+    {
+        $iter = Gen::range(3, 3);
+        $this->assertIterable([3], $iter);
     }
 
     public function testRangeRequiresPositiveIntegerForStep()
     {
         $this->expectException(InvalidArgumentException::class);
-        Iter::toArray(Gen::range(1, 5, 0));
+        $this->consumeIterable(Gen::range(1, 5, 0));
+    }
+
+    public function testRepeatWithFiniteLength()
+    {
+        $iter = Gen::repeat('a', 3);
+        $this->assertIterable(['a', 'a', 'a'], $iter);
+    }
+
+    public function testRepeatWithInfiniteLength()
+    {
+        $iter = Iter::take(Gen::repeat('a'), 5);
+        $this->assertIterable(['a', 'a', 'a', 'a', 'a'], $iter);
+    }
+
+    public function testRepeatForKeys()
+    {
+        $iter = Gen::repeatForKeys(['a', 'b', 'c'], 2);
+        $this->assertIterable(['a' => 2, 'b' => 2, 'c' => 2], $iter, Iter::PRESERVE_KEYS);
+    }
+
+    public function testEmpty()
+    {
+        $iter = Gen::empty();
+        $this->assertIterable([], $iter);
+    }
+
+    public function testJustWithScalarValue()
+    {
+        $iter = Gen::just('a');
+        $this->assertIterable(['a'], $iter);
+    }
+
+    public function testJustWithIterableValue()
+    {
+        $iter = Gen::just(['a', 'b']);
+        $this->assertIterable([['a', 'b']], $iter);
+    }
+
+    public function testFromWithScalarValue()
+    {
+        $iter = Gen::from('a');
+        $this->assertIterable(['a'], $iter);
+    }
+
+    public function testFromWithIterableValue()
+    {
+        $iter = Gen::from(['a', 'b']);
+        $this->assertIterable(['a', 'b'], $iter);
+    }
+
+    public function testDefer()
+    {
+        $iter = Gen::defer(function () { return ['a', 'b', 'c']; });
+        $this->assertIterable(['a', 'b', 'c'], $iter);
+    }
+
+    public function testExplodeWithSmallString()
+    {
+        $iter = Gen::explode('a,b,c', ',');
+        $this->assertIterable(['a', 'b', 'c'], $iter);
+    }
+
+    public function testExplodeWithLongString()
+    {
+        $iter = Gen::explode('a,b,c,d,e', ',', 4);
+        $this->assertIterable(['a', 'b', 'c', 'd', 'e'], $iter);
+    }
+
+    public function testExplodeWithMultiCharDelimiter()
+    {
+        $iter = Gen::explode('a, b, c', ', ');
+        $this->assertIterable(['a', 'b', 'c'], $iter);
     }
 }
