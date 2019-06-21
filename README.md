@@ -68,6 +68,6 @@ $collection = Collection::from(self::PEOPLE)
     ->map(Func::property('name'))
     ->drop(1);
 
-print_r(Iter::toArray($iter));
+print_r(Iter::toArray($collection));
 #> ['Cally', 'Danny', 'Tommy']
 ```
