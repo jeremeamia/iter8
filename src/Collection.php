@@ -6,7 +6,9 @@ use Iterator;
 use IteratorIterator;
 
 /**
- * Collection object that represents an iterable and exposes iterable and function operations.
+ * Collection object that encapsulates an iterable and exposes chainable iterable transformation operations.
+ *
+ * This class uses __call() and __callStatic() to apply operations from the Iter class.
  *
  * @method static Collection defer(callable $fn, array $args = []) Create a collection using the Gen::defer operation.
  * @method static Collection empty() Create a collection using the Gen::empty operation.
@@ -66,7 +68,6 @@ use IteratorIterator;
  * @method int streamTo(iterable $iter, resource &$stream) Perform the Iter::apply operation on the collection.
  * @method mixed rewindable() Convert the collection to another format using the Iter::rewindable operation.
  * @method array toArray() Convert the collection to another format using the Iter::toArray operation.
- * @method Iterator toIter() Convert the collection to another format using the Iter::toIter operation.
  * @method resource toStream() Convert the collection to another format using the Iter::toStream operation.
  * @method string toString() Convert the collection to another format using the Iter::toString operation.
  */
@@ -76,6 +77,8 @@ class Collection extends IteratorIterator
     private $consumed = false;
 
     /**
+     * Create a new Collection from any iterable.
+     *
      * @param iterable $data
      * @return Collection
      */
@@ -107,7 +110,7 @@ class Collection extends IteratorIterator
     public function __call(string $method, array $args)
     {
         $this->errorIfConsumed();
-        $result = Iter::$method($this->getInnerIterator(), ...$args);
+        $result = Iter::{$method}($this->getInnerIterator(), ...$args);
 
         if ($result instanceof Iterator) {
             $result = new static($result);
