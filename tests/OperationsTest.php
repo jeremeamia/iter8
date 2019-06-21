@@ -19,7 +19,7 @@ class IterTest extends TestCase
      * @param bool $preserveKeys
      * @dataProvider provideOperationTestCases
      */
-    public function testTransformativeOperationsViaIter(
+    public function testCanApplyTransformativeOperationsViaIter(
         string $operation,
         iterable $inputIter,
         array $inputArgs,
@@ -38,7 +38,7 @@ class IterTest extends TestCase
      * @param bool $preserveKeys
      * @dataProvider provideOperationTestCases
      */
-    public function testTransformativeOperationsViaPipe(
+    public function testCanApplyTransformativeOperationsViaPipe(
         string $operation,
         iterable $inputIter,
         array $inputArgs,
@@ -57,7 +57,7 @@ class IterTest extends TestCase
      * @param bool $preserveKeys
      * @dataProvider provideOperationTestCases
      */
-    public function testTransformativeOperationsViaCollection(
+    public function testCanApplyTransformativeOperationsViaCollection(
         string $operation,
         iterable $inputIter,
         array $inputArgs,

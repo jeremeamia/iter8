@@ -24,11 +24,12 @@ final class Iter
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns a new iterable with items mapped from the source by the mapper function.
+     * Creates a new iterable with items mapped from the source by the mapper function.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Mapper function for values.
      * @return Iterator
+     * @see array_map()
      */
     public static function map(iterable $iter, callable $fn): Iterator
     {
@@ -38,7 +39,7 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable where the keys are replaced by applying the mapper function to the source keys.
+     * Creates a new iterable where the source keys are replaced by applying the mapper function to the source keys.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Mapper function for keys.
@@ -52,11 +53,17 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable where the keys are replaced by applying the mapper function to the source values.
+     * Creates a new iterable where the source keys are replaced by applying the mapper function to the source values.
+     *
+     * Example:
+     *
+     *     $iter = Iter::reindex([['id' => 'a', 'name' => 'Alice'], ['id' => 'b', 'name' => 'Bob']], Func::index('id'));
+     *     #> ['a' => ['id' => 'a', 'name' => 'Alice'], 'b' => ['id' => 'b', 'name' => 'Bob']]
      *
      * @param iterable $iter Source data.
      * @param callable $fn Mapper function for values.
      * @return Iterator
+     * @see array_pluck()
      */
     public static function reindex(iterable $iter, callable $fn): Iterator
     {
@@ -66,11 +73,17 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable with items mapped from the source by plucking a key.
+     * Creates a new iterable with items mapped from the source by plucking a key.
      *
-     * @param iterable $iter Source data.
-     * @param string $key Key to pluck from each item.
+     * Example:
+     *
+     *     $iter = Iter::pluck([['name' => 'Jeremy'], ['name' => 'Penny'], ['name' => 'Joey']], 'name');
+     *     #> ['Jeremy', 'Penny', 'Joey']
+     *
+     * @param iterable $iter Source data. Assumes that the data is a list of homogeneous associative arrays.
+     * @param string $key Key to pluck from each associative array item.
      * @return Iterator
+     * @see array_pluck()
      */
     public static function pluck(iterable $iter, string $key): Iterator
     {
@@ -78,7 +91,12 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable of key-value tuples mapped from the source.
+     *
+     * Example:
+     *
+     *     $iter = Iter::toKeyPairs(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     #> [['a', 1], ['b', 2], ['c', 3]]
      *
      * @param iterable $iter Source data.
      * @return Iterator
@@ -91,7 +109,12 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new associative-style iterable mapped from key-value tuples in the source.
+     *
+     * Example:
+     *
+     *     $iter = Iter::fromKeyPairs([['a', 1], ['b', 2], ['c', 3]]);
+     *     #> ['a' => 1, 'b' => 2, 'c' => 3]
      *
      * @param iterable $iter Source data.
      * @return Iterator
@@ -826,12 +849,16 @@ final class Iter
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Creates an array from the source data. By default, the items are re-indexed.
+     * Creates an array from the provided iterable.
      *
-     * NOTE: This will not be needed with PHP 7.4+, since you can do: `$array = [...$iter];`
+     * By default, the items are re-indexed with numerical keys.
+     *
+     * You can use Iter::PRESERVE_KEYS as the second argument to preserve the iterables keys. When doing this, you
+     * should be conscious of the structure of the iterable. Flattened iterables can contain duplicate keys, and some
+     * generators can yield non-scalar keys. Preserving the keys in these cases may cause errors or data loss.
      *
      * @param iterable $iter Source data.
-     * @param bool $preserveKeys Set to true to keep the keys from the source. (Be careful with flattened data!)
+     * @param bool $preserveKeys Set to true to keep the keys from the source.
      * @return array
      */
     public static function toArray(iterable $iter, bool $preserveKeys = false): array
@@ -844,7 +871,7 @@ final class Iter
     }
 
     /**
-     * Creates an Iterator from the source data.
+     * Creates an Iterator from the provided iterable.
      *
      * @param iterable $iter Source data.
      * @return Iterator
@@ -855,7 +882,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a string from the provided iterable.
      *
      * @param iterable $iter Source data.
      * @param bool $buffer
@@ -870,11 +897,11 @@ final class Iter
             return $string;
         }
 
-        return implode('', self::toArray($iter));
+        return self::implode($iter, '');
     }
 
     /**
-     * TODO
+     * Creates a stream from the provided iterable.
      *
      * @param iterable $iter Source data.
      * @return resource
@@ -889,7 +916,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a rewindable version of the provided iterable.
      *
      * @param iterable $iter Source data.
      * @return Iterator
@@ -900,7 +927,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a collection from the provided iterable.
      *
      * @param iterable $iter Source data.
      * @return Iterator

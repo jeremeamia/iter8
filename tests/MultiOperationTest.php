@@ -39,7 +39,7 @@ class MultiOperationTest extends TestCase
         ],
     ];
 
-    public function testMultipleIterOperations()
+    public function testCanApplyMultipleOperationsUsingIterFlow()
     {
         $iter = Gen::from(self::PEOPLE);
         $iter = Iter::flatten($iter);
@@ -51,7 +51,7 @@ class MultiOperationTest extends TestCase
         $this->assertIterable(['Cally', 'Danny', 'Tommy'], $iter);
     }
 
-    public function testMultiplePipeOperations()
+    public function testCanApplyMultipleOperationsUsingPipeFlow()
     {
         $iter = Iter::pipe(Gen::from(self::PEOPLE), [
             Pipe::flatten(),
@@ -64,7 +64,7 @@ class MultiOperationTest extends TestCase
         $this->assertIterable(['Cally', 'Danny', 'Tommy'], $iter);
     }
 
-    public function testMultipleCollectionOperations()
+    public function testCanApplyMultipleOperationsUsingCollectionFlow()
     {
         $collection = Collection::from(self::PEOPLE)
             ->flatten()

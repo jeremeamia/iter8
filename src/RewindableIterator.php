@@ -61,7 +61,7 @@ class RewindableIterator implements OuterIterator, Countable
     {
         $key = $this->iterator->key();
 
-        if ($this->cache && !isset($key)) {
+        if ($this->cache && !isset($this->cache[$key])) {
             $this->cache[$key] = $this->iterator->current();
         }
 
