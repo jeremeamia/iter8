@@ -115,6 +115,75 @@ class IterTest extends TestCase
             Iter::PRESERVE_KEYS
         ];
 
+        yield 'reindex' => [
+            'reindex',
+            Iter::toIter([
+                ['id' => 'a', 'name' => 'Alice'],
+                ['id' => 'b', 'name' => 'Bob'],
+            ]),
+            [Func::index('id')],
+            [
+                'a' => ['id' => 'a', 'name' => 'Alice'],
+                'b' => ['id' => 'b', 'name' => 'Bob'],
+            ],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'pluck' => [
+            'pluck',
+            Iter::toIter([
+                ['id' => 'a', 'name' => 'Alice'],
+                ['id' => 'b', 'name' => 'Bob'],
+            ]),
+            ['name'],
+            ['Alice', 'Bob']
+        ];
+
+        yield 'toKeyPairs' => [
+            'toKeyPairs',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [],
+            [['a', 1], ['b', 2], ['c', 3]]
+        ];
+
+        yield 'fromKeyPairs' => [
+            'fromKeyPairs',
+            Iter::toIter([['a', 1], ['b', 2], ['c', 3]]),
+            [],
+            ['a' => 1, 'b' => 2, 'c' => 3],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'keys' => [
+            'keys',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [],
+            ['a', 'b', 'c']
+        ];
+
+        yield 'values' => [
+            'values',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [],
+            [1, 2, 3],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'flip' => [
+            'flip',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [],
+            [1 => 'a', 2 => 'b', 3 => 'c'],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'replay' => [
+            'replay',
+            Iter::toIter([1, 2, 3]),
+            [3],
+            [1, 2, 3, 1, 2, 3, 1, 2, 3]
+        ];
+
         yield 'scan' => [
             'scan',
             Iter::toIter([1, 2, 3, 4]),

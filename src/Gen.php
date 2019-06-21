@@ -184,4 +184,28 @@ final class Gen
             }
         }
     }
+
+    /**
+     * Creates an iterable by reading bytes from a stream.
+     *
+     * Example:
+     *
+     *     $iter = Gen::stream($fileHandle, 4);
+     *     #> ['Ther', 'e is', ' dat', 'a he', 're.']
+     *
+     * @param resource $stream Source stream.
+     * @param int $bufferSize Number of bytes to read from the stream at a time.
+     * @return \Generator
+     */
+    public static function stream(&$stream, int $bufferSize = 8 * self::KB)
+    {
+        while (!feof($stream)) {
+            $buffer = fread($stream, $bufferSize);
+            if ($buffer === false || $buffer === '') {
+                break;
+            }
+
+            yield $buffer;
+        }
+    }
 }

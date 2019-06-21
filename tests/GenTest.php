@@ -94,21 +94,31 @@ class GenTest extends TestCase
         $this->assertIterable(['a', 'b', 'c'], $iter);
     }
 
-    public function testCanCreateIteratorWithExplodeUsingSmallString()
+    public function testCanCreateIterableWithExplodeUsingSmallString()
     {
         $iter = Gen::explode('a,b,c', ',');
         $this->assertIterable(['a', 'b', 'c'], $iter);
     }
 
-    public function testCanCreateIteratorWithExplodeUsingLongString()
+    public function testCanCreateIterableWithExplodeUsingLongString()
     {
         $iter = Gen::explode('a,b,c,d,e', ',', 4);
         $this->assertIterable(['a', 'b', 'c', 'd', 'e'], $iter);
     }
 
-    public function testCanCreateIteratorWithExplodeUsingMultiCharDelimiter()
+    public function testCanCreateIterableWithExplodeUsingMultiCharDelimiter()
     {
         $iter = Gen::explode('a, b, c', ', ');
         $this->assertIterable(['a', 'b', 'c'], $iter);
+    }
+
+    public function testCanCreateIterableByReadingFromStream()
+    {
+        $stream = fopen('php://temp', 'w+');
+        fwrite($stream, 'There is data here.');
+        fseek($stream, 0);
+
+        $iter = Gen::stream($stream, 4);
+        $this->assertIterable(['Ther', 'e is', ' dat', 'a he', 're.'], $iter);
     }
 }

@@ -127,10 +127,16 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable that ignores values and takes only the keys from the source.
+     * Creates a new iterable that discards values and emits only the keys from the source.
+     *
+     * Example:
+     *
+     *     $iter = Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     #> ['a', 'b', 'c']
      *
      * @param iterable $iter Source data.
      * @return Iterator
+     * @see array_keys()
      */
     public static function keys(iterable $iter): Iterator
     {
@@ -140,10 +146,16 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable that ignores keys and takes only the values from the source.
+     * Creates a new iterable that discards keys and emits only the values from the source.
+     *
+     * Example:
+     *
+     *     $iter = Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     #> [1, 2, 3]
      *
      * @param iterable $iter Source data.
      * @return Iterator
+     * @see array_values()
      */
     public static function values(iterable $iter): Iterator
     {
@@ -153,10 +165,16 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable that flips the keys and arrays (like array_flip).
+     * Creates a new iterable where the values and keys from the source data are exchanged.
+     *
+     * Example:
+     *
+     *     $iter = Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     #> [1 => 'a', 2 => 'b', 3 => 'c']
      *
      * @param iterable $iter Source data.
      * @return Iterator
+     * @see array_flip()
      */
     public static function flip(iterable $iter): Iterator
     {
@@ -421,7 +439,12 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable that replays the entire source iterable for the specified number of times.
+     *
+     * Example:
+     *
+     *     $iter = Iter::replay([1, 2, 3], 3);
+     *     #> [1, 2, 3, 1, 2, 3, 1, 2, 3]
      *
      * @param iterable $iter Source data.
      * @param int|null $times
