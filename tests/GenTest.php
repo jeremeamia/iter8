@@ -118,7 +118,7 @@ class GenTest extends TestCase
         fwrite($stream, 'There is data here.');
         fseek($stream, 0);
 
-        $iter = Gen::stream($stream, 4);
+        $iter = Gen::fromStream($stream, 4);
         $this->assertIterable(['Ther', 'e is', ' dat', 'a he', 're.'], $iter);
     }
 }

@@ -197,7 +197,7 @@ final class Gen
      * @param int $bufferSize Number of bytes to read from the stream at a time.
      * @return \Generator
      */
-    public static function stream(&$stream, int $bufferSize = 8 * self::KB)
+    public static function fromStream(&$stream, int $bufferSize = 8 * self::KB)
     {
         while (!feof($stream)) {
             $buffer = fread($stream, $bufferSize);

@@ -71,8 +71,8 @@ class IterTest extends TestCase
 
     public function provideOperationTestCases()
     {
-        yield 'buffer' => [
-            'buffer',
+        yield 'chunk' => [
+            'chunk',
             Iter::toIter([1, 2, 3, 4, 5, 6, 7, 8]),
             [3],
             [[1, 2, 3], [4, 5, 6], [7, 8]]
@@ -99,8 +99,8 @@ class IterTest extends TestCase
             [2, 4, 6]
         ];
 
-        yield 'map (with keys)' => [
-            'map',
+        yield 'mapWithKeys' => [
+            'mapWithKeys',
             Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
             [Func::operator('*', 2)],
             ['a' => 2, 'b' => 4, 'c' => 6],

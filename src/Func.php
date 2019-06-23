@@ -136,6 +136,7 @@ final class Func
      *     $fn(true)
      *     #> false
      *
+     * @param callable $fn
      * @return callable
      */
     public static function not(callable $fn): callable
@@ -186,17 +187,47 @@ final class Func
     }
 
     /**
+     * Creates a callable that is a composition of the provided callable unary functions.
+     *
+     * The main use case in this lib is for iterable transformation functions, but it's technically generic.
+     *
+     * Example:
+     *
+     *     $fn = Func::compose([
+     *         Pipe::debounce(),
+     *         Pipe::map(Func::operator('*', 2)),
+     *         Pipe::filter(Func::operator('>', 10)),
+     *     ]);
+     *
+     *     $iter = $fn([2, 2, 6, 3, 8, 8]);
+     *     #> [12, 16]
+     *
+     * @param iterable $operations
+     * @return callable
+     */
+    public static function compose(iterable $operations): callable
+    {
+        return function ($data) use (&$operations) {
+            foreach ($operations as $operation) {
+                $data = $operation($data);
+            }
+
+            return $data;
+        };
+    }
+
+    /**
      * Creates a callable that returns the result of a standard PHP mathematical, bitwise, or boolean operator.
      *
      * This can be used for more mapping or reducing.
      *
-     * Example:
+     * Example (reduce):
      *
      *     $fn = Func::operator('+');
      *     $fn(3, 7)
      *     #> 10
      *
-     * Example:
+     * Example (map):
      *
      *     $fn = Func::operator('+', 7);
      *     $fn(3)
@@ -228,14 +259,20 @@ final class Func
                 case '.': return $leftOperand . $rightOperand;
 
                 case '==': return $leftOperand == $rightOperand;
+                case '!=': return $leftOperand != $rightOperand;
                 case '>=': return $leftOperand >= $rightOperand;
                 case '<=': return $leftOperand <= $rightOperand;
                 case '||': return $leftOperand || $rightOperand;
                 case '&&': return $leftOperand && $rightOperand;
                 case '**': return $leftOperand ** $rightOperand;
+                case '>>': return $leftOperand >> $rightOperand;
+                case '<<': return $leftOperand << $rightOperand;
 
                 case '===': return $leftOperand === $rightOperand;
+                case '!==': return $leftOperand !== $rightOperand;
                 case '<=>': return $leftOperand <=> $rightOperand;
+
+                case 'instanceof': return $leftOperand instanceof $rightOperand;
 
                 default: throw new UnexpectedValueException("Unexpected operator: {$operator}");
             }

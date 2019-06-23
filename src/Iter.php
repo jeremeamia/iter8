@@ -34,6 +34,21 @@ final class Iter
     public static function map(iterable $iter, callable $fn): Iterator
     {
         foreach ($iter as $key => $value) {
+            yield $key => $fn($value);
+        }
+    }
+
+    /**
+     * Creates a new iterable with items mapped by the mapper function, which is called with both the value and key.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Mapper function for values.
+     * @return Iterator
+     * @see array_map()
+     */
+    public static function mapWithKeys(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
             yield $key => $fn($value, $key);
         }
     }
@@ -48,7 +63,7 @@ final class Iter
     public static function mapKeys(iterable $iter, callable $fn): Iterator
     {
         foreach ($iter as $key => $value) {
-            yield $fn($key, $value) => $value;
+            yield $fn($key) => $value;
         }
     }
 
@@ -68,7 +83,7 @@ final class Iter
     public static function reindex(iterable $iter, callable $fn): Iterator
     {
         foreach ($iter as $key => $value) {
-            yield $fn($value, $key) => $value;
+            yield $fn($value) => $value;
         }
     }
 
@@ -195,6 +210,22 @@ final class Iter
      * @return Iterator
      */
     public static function filter(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            if ($fn($value)) {
+                yield $key => $value;
+            }
+        }
+    }
+
+    /**
+     * Returns a new iterable with items filtered out by the filter function, which is called with both the value & key.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Filter function (i.e., predicate).
+     * @return Iterator
+     */
+    public static function filterWithKeys(iterable $iter, callable $fn): Iterator
     {
         foreach ($iter as $key => $value) {
             if ($fn($value, $key)) {
@@ -394,30 +425,43 @@ final class Iter
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns a new iterable of arrays of size $size that are groups of items from the source.
+     * Creates a new iterable of iterables where the source has been divided into chunks of the specified size.
+     *
+     * Example:
+     *
+     *     $iter = Iter::chunk([1, 2, 3, 4, 5, 6, 7], 2);
+     *     #> [[1, 2], [3, 4], [5, 6], [7]]
      *
      * @param iterable $iter Source data.
-     * @param int $size The desired buffer size.
+     * @param int $size The desired chunk size.
      * @return Iterator
+     * @see array_chunk()
      */
-    public static function buffer(iterable $iter, int $size): Iterator
+    public static function chunk(iterable $iter, int $size): Iterator
     {
-        $buffer = [];
+        $chunk = [];
         foreach ($iter as $item) {
-            $buffer[] = $item;
-            if (count($buffer) === $size) {
-                yield $buffer;
-                $buffer = [];
+            $chunk[] = $item;
+            if (count($chunk) === $size) {
+                yield $chunk;
+                $chunk = [];
             }
         }
 
-        if (count($buffer) > 0) {
-            yield $buffer;
+        if (count($chunk) > 0) {
+            yield $chunk;
         }
     }
 
     /**
-     * TODO
+     * Creates a new iterable of iterables where the source has been divided into the specified number of partitions.
+     *
+     * Note: The partitioning is done like dealing cards.
+     *
+     * Example:
+     *
+     *     $iter = Iter::partition([1, 2, 3, 4, 5, 6, 7], 3);
+     *     #> [[1, 4, 7], [2, 5], [3, 6]]
      *
      * @param iterable $iter Source data.
      * @param int $count The desired number of $partitions.
@@ -658,11 +702,7 @@ final class Iter
      */
     public static function pipe(iterable $iter, iterable $operations): Iterator
     {
-        foreach ($operations as $operation) {
-            $iter = $operation($iter);
-        }
-
-        return $iter;
+        return Gen::from(Func::compose($operations)($iter));
     }
 
     /**
@@ -712,8 +752,8 @@ final class Iter
     public static function scan(iterable $iter, callable $fn, $initialValue = null): Iterator
     {
         $accumulator = $initialValue;
-        foreach ($iter as $key => $value) {
-            $accumulator = $fn($accumulator, $value, $key);
+        foreach ($iter as $value) {
+            $accumulator = $fn($accumulator, $value);
             yield $accumulator;
         }
     }

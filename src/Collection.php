@@ -14,12 +14,13 @@ use IteratorIterator;
  * @method static Collection empty() Create a collection using the Gen::empty operation.
  * @method static Collection explode(string $source, string $delimiter, int $threshold = 1024) Create a collection using the Gen::explode operation.
  * @method static Collection from($value) Create a collection using the Gen::from operation.
+ * @method static Collection fromStream(resource $stream, int $bufferLength = 8192) Create a collection using the Gen::stream operation.
  * @method static Collection just($value) Create a collection using the Gen::just operation.
  * @method static Collection range(int $start, int $end) Create a collection using the Gen::range operation.
  * @method static Collection repeat($value, ?int $times = null) Create a collection using the Gen::repeat operation.
  * @method static Collection repeatForKeys(iterable $keys, $value) Create a collection using the Gen::repeatForKeys operation.
  * @method static Collection stream(resource $stream, int $bufferLength = 8192) Create a collection using the Gen::stream operation.
- * @method Collection buffer(int $size) Transform the collection using the Iter::buffer operation.
+ * @method Collection chunk(int $size) Transform the collection using the Iter::buffer operation.
  * @method Collection concat(iterable $iter, iterable ...$iters) Transform the collection using the Iter::concat operation.
  * @method Collection combineLatest(iterable $iter, iterable ...$iters) Transform the collection using the Iter::combineLatest operation.
  * @method Collection debounce() Transform the collection using the Iter::debounce operation.
@@ -30,6 +31,7 @@ use IteratorIterator;
  * @method Collection filterEmpty() Transform the collection using the Iter::filterEmpty operation.
  * @method Collection filterKeys(callable $fn) Transform the collection using the Iter::filterKeys operation.
  * @method Collection filterNulls() Transform the collection using the Iter::filterNulls operation.
+ * @method Collection filterWithKeys() Transform the collection using the Iter::filterWithKeys operation.
  * @method Collection flatMap(callable $fn) Transform the collection using the Iter::flatMap operation.
  * @method Collection flatten(int $levels = 1) Transform the collection using the Iter::flatten operation.
  * @method Collection flip() Transform the collection using the Iter::flip operation.
@@ -39,6 +41,7 @@ use IteratorIterator;
  * @method Collection leaves() Transform the collection using the Iter::leaves operation.
  * @method Collection map(callable $fn) Transform the collection using the Iter::map operation.
  * @method Collection mapKeys(callable $fn) Transform the collection using the Iter::mapKeys operation.
+ * @method Collection mapWithKeys(callable $fn) Transform the collection using the Iter::mapWithKeys operation.
  * @method Collection normalize() Transform the collection using the Iter::normalize operation.
  * @method Collection partition(int $count) Transform the collection using the Iter::partition operation.
  * @method Collection pipe(iterable $operations) Transform the collection using the Iter::pipe operation.

@@ -9,7 +9,7 @@ use Iterator;
  *
  * @method static callable any(callable $fn) Get pipe-able any operation.
  * @method static callable all(callable $fn) Get pipe-able all operation.
- * @method static callable buffer(int $size) Get pipe-able buffer operation.
+ * @method static callable chunk(int $size) Get pipe-able buffer operation.
  * @method static callable concat(iterable ...$iters) Get pipe-able concat operation.
  * @method static callable combineLatest(iterable ...$iters) Get pipe-able combineLatest operation.
  * @method static callable debounce() Get pipe-able debounce operation.
@@ -20,6 +20,7 @@ use Iterator;
  * @method static callable filterEmpty() Get pipe-able filterEmpty operation.
  * @method static callable filterKeys(callable $fn) Get pipe-able filterKeys operation.
  * @method static callable filterNulls() Get pipe-able filterNulls operation.
+ * @method static callable filterWithKeys() Get pipe-able filterWithKeys operation.
  * @method static callable first() Get pipe-able first operation.
  * @method static callable flatMap(callable $fn) Get pipe-able flatMap operation.
  * @method static callable flatten() Get pipe-able flatten operation.
@@ -32,6 +33,7 @@ use Iterator;
  * @method static callable leaves() Get pipe-able leaves operation.
  * @method static callable map(callable $fn) Get pipe-able map operation.
  * @method static callable mapKeys(callable $fn) Get pipe-able mapKeys operation.
+ * @method static callable mapWithKeys(callable $fn) Get pipe-able mapWithKeys operation.
  * @method static callable partition(int $count) Get pipe-able chunk operation.
  * @method static callable pluck(string $key) Get pipe-able pluck operation.
  * @method static callable normalize() Get pipe-able pluck operation.
