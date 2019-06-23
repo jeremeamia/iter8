@@ -75,4 +75,17 @@ class MultiOperationTest extends TestCase
 
         $this->assertIterable(['Cally', 'Danny', 'Tommy'], $collection);
     }
+
+    public function testCanApplyMultipleOperationsUsingPipeFlowWithSwitchMap()
+    {
+        $iter = Iter::pipe(Gen::from(self::PEOPLE['students']), [
+            Pipe::map(Func::index('name')),
+            Pipe::first(),
+            Pipe::switchMap(function (string $name) { return str_split($name); }),
+            Pipe::debounce(),
+            Pipe::map('strtoupper')
+        ]);
+
+        $this->assertIterable(['A', 'B', 'Y'], $iter);
+    }
 }

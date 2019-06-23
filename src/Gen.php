@@ -117,7 +117,7 @@ final class Gen
      */
     public static function just($value): Iterator
     {
-        return Iter::toIter([$value]);
+        yield $value;
     }
 
     /**
@@ -133,7 +133,11 @@ final class Gen
      */
     public static function from($value): Iterator
     {
-        return Iter::toIter(is_iterable($value) ? $value : [$value]);
+        if (is_iterable($value)) {
+            yield from $value;
+        } else {
+            yield $value;
+        }
     }
 
     /**

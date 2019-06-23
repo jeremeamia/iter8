@@ -2,8 +2,6 @@
 
 namespace Jeremeamia\Iter8;
 
-use Iterator;
-
 /**
  * Pipe is a helper that provides callables for pipe-able Iter functions to be used with Iter::pipe().
  *
@@ -69,19 +67,21 @@ final class Pipe
     }
 
     /**
-     * TODO
+     * Creates a pipe-able callable for converting the provided value into an iterable via the provided function.
      *
-     * @param mixed $value
+     * Example:
+     *
+     *     $fn = Pipe::switchMap(function (int $n) { return Gen::range(1, $n); });
+     *     $iter = $fn(3);
+     *     #> [1, 2, 3]
+     *
      * @param callable $fn Function to map the value to a new iterable.
-     * @return Iterator
+     * @return callable
      */
-    public static function switchMap($value, callable $fn): Iterator
+    public static function switchMap(callable $fn): callable
     {
-        $result = $fn($value);
-        if (is_iterable($result)) {
-            yield from $result;
-        } else {
-            yield $result;
-        }
+        return function ($value) use (&$fn) {
+            return Gen::from($fn($value));
+        };
     }
 }
