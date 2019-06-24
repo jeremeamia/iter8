@@ -27,58 +27,57 @@ class Person
 class MultiOperationTest extends TestCase
 {
     const PEOPLE = [
-        'students' => [
-            ['name' => 'Abby',  'age' => 19],
-            ['name' => 'Benny', 'age' => 21],
-            ['name' => 'Cally', 'age' => 22],
-            ['name' => 'Danny', 'age' => 24],
-            ['name' => 'Eddy',  'age' => 18],
-        ],
-        'teachers' => [
-            ['name' => 'Tommy', 'age' => 58],
-        ],
+        ['name' => 'Abby',  'age' => 19],
+        ['name' => 'Benny', 'age' => 21],
+        ['name' => 'Cally', 'age' => 22],
+        ['name' => 'Danny', 'age' => 24],
+        ['name' => 'Danny', 'age' => 23],
+        ['name' => 'Eddy',  'age' => 18],
     ];
 
     public function testCanApplyMultipleOperationsUsingIterFlow()
     {
         $iter = Gen::from(self::PEOPLE);
-        $iter = Iter::flatten($iter);
-        $iter = Iter::map($iter, function (array $data) { return new Person($data); });
-        $iter = Iter::filter($iter, function (Person $person) { return $person->age >= 20; });
-        $iter = Iter::map($iter, Func::property('name'));
-        $iter = Iter::drop($iter, 1);
+        $iter = Iter::filter($iter, Func::compose([
+            Func::index('age'),
+            Func::operator('>=', 20),
+        ]));
+        $iter = Iter::map($iter, Func::index('name'));
+        $iter = Iter::debounce($iter);
 
-        $this->assertIterable(['Cally', 'Danny', 'Tommy'], $iter);
+        $this->assertIterable(['Benny', 'Cally', 'Danny'], $iter);
     }
 
     public function testCanApplyMultipleOperationsUsingPipeFlow()
     {
         $iter = Iter::pipe(Gen::from(self::PEOPLE), [
-            Pipe::flatten(),
-            Pipe::map(function (array $data) { return new Person($data); }),
-            Pipe::filter(function (Person $person) { return $person->age >= 20; }),
-            Pipe::map(Func::property('name')),
-            Pipe::drop(1),
+            Pipe::filter(Func::compose([
+                Func::index('age'),
+                Func::operator('>=', 20),
+            ])),
+            Pipe::map(Func::index('name')),
+            Pipe::debounce(),
         ]);
 
-        $this->assertIterable(['Cally', 'Danny', 'Tommy'], $iter);
+        $this->assertIterable(['Benny', 'Cally', 'Danny'], $iter);
     }
 
     public function testCanApplyMultipleOperationsUsingCollectionFlow()
     {
         $collection = Collection::from(self::PEOPLE)
-            ->flatten()
-            ->map(function (array $data) { return new Person($data); })
-            ->filter(function (Person $person) { return $person->age >= 20; })
-            ->map(Func::property('name'))
-            ->drop(1);
+            ->filter(Func::compose([
+                Func::index('age'),
+                Func::operator('>=', 20),
+            ]))
+            ->map(Func::index('name'))
+            ->debounce();
 
-        $this->assertIterable(['Cally', 'Danny', 'Tommy'], $collection);
+        $this->assertIterable(['Benny', 'Cally', 'Danny'], $collection);
     }
 
     public function testCanApplyMultipleOperationsUsingPipeFlowWithSwitchMap()
     {
-        $iter = Iter::pipe(Gen::from(self::PEOPLE['students']), [
+        $iter = Iter::pipe(Gen::from(self::PEOPLE), [
             Pipe::map(Func::index('name')),
             Pipe::first(),
             Pipe::switchMap(function (string $name) { return str_split($name); }),
