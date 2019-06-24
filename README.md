@@ -44,7 +44,7 @@ const PEOPLE = [
 You can use the `Iter` functions to transform and operate on the data via generators.
 
 ```php
-$iter = Gen::from(self::PEOPLE);
+$iter = Gen::from(PEOPLE);
 $iter = Iter::filter($iter, Func::compose([
     Func::index('age'),
     Func::operator('>=', 20),
@@ -61,7 +61,7 @@ print_r(Iter::toArray($iter));
 You can also use a "pipe"-style list of functions to transform and operate on the data via generators.
         
 ```php
-$iter = Iter::pipe(Gen::from(self::PEOPLE), [
+$iter = Iter::pipe(Gen::from(PEOPLE), [
     Pipe::filter(Func::compose([
         Func::index('age'),
         Func::operator('>=', 20),
@@ -79,7 +79,7 @@ print_r(Iter::toArray($iter));
 Finally, you can use an OOP Collection object to transform and operate on the data via generators.
 
 ```php
-$collection = Collection::from(self::PEOPLE)
+$collection = Collection::from(PEOPLE)
     ->filter(Func::compose([
         Func::index('age'),
         Func::operator('>=', 20),
@@ -109,7 +109,7 @@ sources for ideas.
 
 Finally, I've also taken ideas from the [Laravel Collections][laravel] library, and though I also have similar
 functions, my implementations very greatly as they are founded upon generators, not arrays. This means that random
-access of values Iter8 collections is not supported.
+array access of values in Iter8 collections is not supported.
 
 [iter]: https://github.com/nikic/iter
 [ReactiveX]: http://reactivex.io/
