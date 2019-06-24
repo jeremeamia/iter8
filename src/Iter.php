@@ -606,7 +606,7 @@ final class Iter
             self::all($iters, Func::method('valid'));
             self::apply($iters, Func::method('next'))
         ) {
-            yield array_map(Func::method('current'), $iters);
+            yield from array_map(Func::method('current'), $iters);
         }
     }
 
@@ -926,11 +926,9 @@ final class Iter
      */
     public static function toArray(iterable $iter, bool $preserveKeys = false): array
     {
-        if (is_array($iter)) {
-            return $preserveKeys ? $iter : array_values($iter);
-        }
-
-        return iterator_to_array($iter, $preserveKeys);
+        return is_array($iter)
+            ? ($preserveKeys ? $iter : array_values($iter))
+            : iterator_to_array($iter, $preserveKeys);
     }
 
     /**

@@ -197,5 +197,19 @@ class IterTest extends TestCase
             [3],
             [1, 2, 3]
         ];
+
+        yield 'concat' => [
+            'concat',
+            Iter::toIter([1, 2, 3]),
+            [Iter::toIter([4, 5, 6]), Iter::toIter([7, 8, 9])],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        ];
+
+        yield 'zip' => [
+            'zip',
+            Iter::toIter([1, 4, 7]),
+            [Iter::toIter([2, 5, 8]), Iter::toIter([3, 6, 9])],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        ];
     }
 }
