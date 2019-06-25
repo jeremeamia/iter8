@@ -12,12 +12,12 @@ jobs:
           command: php --version
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "composer.lock" }}
+            - php-7.2-dependencies-{{ checksum "composer.lock" }}
       - run:
           name: Install Dependencies
           command: composer install --no-interaction --prefer-dist
       - save_cache:
-          key: v1-dependencies-{{ checksum "composer.lock" }}
+          key: php-7.2-dependencies-{{ checksum "composer.lock" }}
           paths:
             - ./vendor
       - run:
@@ -37,14 +37,21 @@ jobs:
           command: php --version
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "composer.lock" }}
+            - php-7.3-dependencies-{{ checksum "composer.lock" }}
       - run:
           name: Install Dependencies
           command: composer install --no-interaction --prefer-dist
       - save_cache:
-          key: v1-dependencies-{{ checksum "composer.lock" }}
+          key: php-7.3-dependencies-{{ checksum "composer.lock" }}
           paths:
             - ./vendor
       - run:
           name: Run Tests
           command: composer test-ci
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - test-7.3
+      - test-7.2
