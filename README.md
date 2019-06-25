@@ -41,8 +41,6 @@ const PEOPLE = [
 
 ### Iter Functions
 
-You can use the `Iter` functions to transform and operate on the data via generators.
-
 ```php
 $iter = Gen::from(PEOPLE);
 $iter = Iter::filter($iter, Func::compose([
@@ -57,8 +55,6 @@ print_r(Iter::toArray($iter));
 ```
 
 ### Pipe Composition
-
-You can also use a "pipe"-style list of functions to transform and operate on the data via generators.
         
 ```php
 $iter = Iter::pipe(Gen::from(PEOPLE), [
@@ -75,8 +71,6 @@ print_r(Iter::toArray($iter));
 ```
 
 ### Collection Object
-
-Finally, you can use an OOP Collection object to transform and operate on the data via generators.
 
 ```php
 $collection = Collection::from(PEOPLE)

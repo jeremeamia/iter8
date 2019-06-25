@@ -4,6 +4,7 @@ namespace Jeremeamia\Iter8\Tests;
 
 use InvalidArgumentException;
 use Jeremeamia\Iter8\{Gen, Iter};
+use RuntimeException;
 
 /**
  * @covers \Jeremeamia\Iter8\Gen
@@ -115,6 +116,10 @@ class GenTest extends TestCase
     public function testCanCreateIterableByReadingFromStream()
     {
         $stream = fopen('php://temp', 'w+');
+        if ($stream === false) {
+            throw new RuntimeException('Failed to open stream.');
+        }
+
         fwrite($stream, 'There is data here.');
         fseek($stream, 0);
 

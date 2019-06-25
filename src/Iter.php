@@ -4,6 +4,7 @@ namespace Jeremeamia\Iter8;
 
 use InvalidArgumentException;
 use Iterator;
+use RuntimeException;
 
 use function array_values, count, is_array, is_iterable, iterator_to_array;
 
@@ -747,7 +748,7 @@ final class Iter
      * @param iterable $iter Source data.
      * @param callable $fn Reducer function.
      * @param mixed|null $initialValue The initial carry value that values are reduced onto.
-     * @return mixed
+     * @return Iterator
      */
     public static function scan(iterable $iter, callable $fn, $initialValue = null): Iterator
     {
@@ -955,6 +956,11 @@ final class Iter
             $buffer = self::toStream($iter);
             $string = stream_get_contents($buffer);
             fclose($buffer);
+
+            if ($string === false) {
+                throw new RuntimeException('Failed to get stream contents.');
+            }
+
             return $string;
         }
 
@@ -970,6 +976,10 @@ final class Iter
     public static function toStream(iterable $iter)#: resource
     {
         $stream = fopen('php://temp', 'w+');
+        if ($stream === false) {
+            throw new RuntimeException('Failed to open stream.');
+        }
+
         self::streamTo($iter, $stream);
         fseek($stream, 0);
 
@@ -980,9 +990,9 @@ final class Iter
      * Creates a rewindable version of the provided iterable.
      *
      * @param iterable $iter Source data.
-     * @return Iterator
+     * @return RewindableIterator
      */
-    public static function rewindable(iterable $iter): Iterator
+    public static function rewindable(iterable $iter): RewindableIterator
     {
         return RewindableIterator::new($iter);
     }

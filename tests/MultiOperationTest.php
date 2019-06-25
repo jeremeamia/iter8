@@ -4,21 +4,6 @@ namespace Jeremeamia\Iter8\Tests;
 
 use Jeremeamia\Iter8\{Func, Gen, Iter, Pipe, Collection};
 
-class Person
-{
-    /** @var string */
-    public $name;
-
-    /** @var int */
-    public $age;
-
-    public function __construct(array $data)
-    {
-        $this->name = $data['name'];
-        $this->age = $data['age'];
-    }
-}
-
 /**
  * @covers \Jeremeamia\Iter8\Iter
  * @covers \Jeremeamia\Iter8\Pipe

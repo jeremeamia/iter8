@@ -20,9 +20,15 @@ class RewindableIterator implements OuterIterator, Countable
     /** @var ArrayIterator|null */
     private $cache;
 
-    public static function new(iterable $iter)
+    /**
+     * Creates a RewindableIterator from the provided iterable.
+     *
+     * @param iterable $iter
+     * @return static
+     */
+    public static function new(iterable $iter): RewindableIterator
     {
-        return new self(is_array($iter) ? new ArrayIterator($iter) : Iter::toIter($iter));
+        return new static(is_array($iter) ? new ArrayIterator($iter) : Iter::toIter($iter));
     }
 
     public function __construct(Iterator $iterator)
@@ -37,7 +43,10 @@ class RewindableIterator implements OuterIterator, Countable
             $this->rewind();
         }
 
-        return $this->iterator;
+        /** @var ArrayIterator $inner */
+        $inner = $this->iterator;
+
+        return $inner;
     }
 
     public function current()#: mixed

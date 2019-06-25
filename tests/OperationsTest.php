@@ -9,7 +9,7 @@ use Jeremeamia\Iter8\{Func, Iter, Pipe, Collection};
  * @covers \Jeremeamia\Iter8\Pipe
  * @covers \Jeremeamia\Iter8\Collection
  */
-class IterTest extends TestCase
+class OperationsTest extends TestCase
 {
     /**
      * @param string $operation

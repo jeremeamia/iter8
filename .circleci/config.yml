@@ -1,0 +1,50 @@
+version: 2
+
+jobs:
+
+  test-7.2:
+    docker:
+      - image: circleci/php:7.2
+    steps:
+      - checkout
+      - run:
+          name: Print PHP Version
+          command: php --version
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "composer.lock" }}
+      - run:
+          name: Install Dependencies
+          command: composer install --no-interaction --prefer-dist
+      - save_cache:
+          key: v1-dependencies-{{ checksum "composer.lock" }}
+          paths:
+            - ./vendor
+      - run:
+          name: Run Static Analysis
+          command: composer stan
+      - run:
+          name: Run Tests
+          command: composer test-ci
+
+  test-7.3:
+    docker:
+      - image: circleci/php:7.3
+    steps:
+      - checkout
+      - run:
+          name: Print PHP Version
+          command: php --version
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "composer.lock" }}
+      - run:
+          name: Install Dependencies
+          command: composer install --no-interaction --prefer-dist
+      - save_cache:
+          key: v1-dependencies-{{ checksum "composer.lock" }}
+          paths:
+            - ./vendor
+      - run:
+          name: Run Tests
+          command: composer test-ci
