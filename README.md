@@ -108,7 +108,7 @@ transformations". The idea of "transducers" themselves are [borrowed from Clojur
 sources for ideas.
 
 Finally, I've also taken ideas from the [Laravel Collections][laravel] library, and though I also have similar
-functions, my implementations very greatly as they are founded upon generators, not arrays. This means that random
+functions, my implementations vary greatly as they are founded upon generators, not arrays. This means that random
 array access of values in Iter8 collections is not supported.
 
 [iter]: https://github.com/nikic/iter
