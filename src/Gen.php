@@ -194,7 +194,7 @@ final class Gen
      *
      * Example:
      *
-     *     $iter = Gen::stream($fileHandle, 4);
+     *     $iter = Gen::fromStream($fileHandle, 4);
      *     #> ['Ther', 'e is', ' dat', 'a he', 're.']
      *
      * @param resource $stream Source stream.
