@@ -28,9 +28,7 @@ use IteratorIterator;
  * @method Collection drop(int $n) Transform the collection using the Iter::drop operation.
  * @method Collection dropWhile(callable $fn) Transform the collection using the Iter::dropWhile operation.
  * @method Collection filter(callable $fn) Transform the collection using the Iter::filter operation.
- * @method Collection filterEmpty() Transform the collection using the Iter::filterEmpty operation.
  * @method Collection filterKeys(callable $fn) Transform the collection using the Iter::filterKeys operation.
- * @method Collection filterNulls() Transform the collection using the Iter::filterNulls operation.
  * @method Collection filterWithKeys() Transform the collection using the Iter::filterWithKeys operation.
  * @method Collection flatMap(callable $fn) Transform the collection using the Iter::flatMap operation.
  * @method Collection flatten(int $levels = 1) Transform the collection using the Iter::flatten operation.
@@ -42,11 +40,14 @@ use IteratorIterator;
  * @method Collection map(callable $fn) Transform the collection using the Iter::map operation.
  * @method Collection mapKeys(callable $fn) Transform the collection using the Iter::mapKeys operation.
  * @method Collection mapWithKeys(callable $fn) Transform the collection using the Iter::mapWithKeys operation.
+ * @method Collection mapRecursive(callable $fn) Transform the collection using the Iter::map operation.
  * @method Collection normalize() Transform the collection using the Iter::normalize operation.
  * @method Collection partition(int $count) Transform the collection using the Iter::partition operation.
  * @method Collection pipe(iterable $operations) Transform the collection using the Iter::pipe operation.
  * @method Collection pluck(string $key) Transform the collection using the Iter::pluck operation.
  * @method Collection reindex(callable $fn) Transform the collection using the Iter::reindex operation.
+ * @method Collection removeEmpty() Transform the collection using the Iter::removeEmpty operation.
+ * @method Collection removeNulls() Transform the collection using the Iter::removeNulls operation.
  * @method Collection replaceKeys(iterable $keys) Transform the collection using the Iter::replaceKeys operation.
  * @method Collection replaceValues(iterable $values) Transform the collection using the Iter::replaceValues operation.
  * @method Collection replay(iterable $values, ?int $times = null) Transform the collection using the Iter::replay operation.
@@ -66,11 +67,15 @@ use IteratorIterator;
  * @method string implode(string $separator = '') Perform the Iter::implode operation on the collection to calculate a result.
  * @method mixed last() Perform the Iter::last operation on the collection to calculate a result.
  * @method mixed reduce(callable $fn, $initialValue = null) Perform the Iter::reduce operation on the collection to calculate a result.
+ * @method mixed reduceRecursive(callable $fn, $initialValue = null) Perform the Iter::reduceRecursive operation on the collection to calculate a result.
  * @method mixed search(callable $fn) Perform the Iter::search operation on the collection to calculate a result.
  * @method void apply(callable $fn, array $args = []) Perform the Iter::apply operation on the collection.
- * @method int streamTo(iterable $iter, resource &$stream) Perform the Iter::apply operation on the collection.
+ * @method void applyRecursive(callable $fn, array $args = []) Perform the Iter::applyRecursive operation on the collection.
+ * @method void print() Perform the Iter::print operation on the collection.
+ * @method int streamTo(iterable $iter, resource &$stream) Perform the Iter::streamTo operation on the collection.
  * @method mixed rewindable() Convert the collection to another format using the Iter::rewindable operation.
  * @method array toArray() Convert the collection to another format using the Iter::toArray operation.
+ * @method array toArrayRecursive() Convert the collection to another format using the Iter::toArrayRecursive operation.
  * @method resource toStream() Convert the collection to another format using the Iter::toStream operation.
  * @method string toString() Convert the collection to another format using the Iter::toString operation.
  */

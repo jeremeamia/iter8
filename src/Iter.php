@@ -40,6 +40,21 @@ final class Iter
     }
 
     /**
+     * Creates a new iterable with items mapped from the source by applying the mapper function recursively.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Mapper function for values.
+     * @return Iterator
+     * @see array_map()
+     */
+    public static function mapRecursive(iterable $iter, callable $fn): Iterator
+    {
+        foreach ($iter as $key => $value) {
+            yield $key => is_iterable($value) ? self::mapRecursive($value, $fn) : $fn($value);
+        }
+    }
+
+    /**
      * Creates a new iterable with items mapped by the mapper function, which is called with both the value and key.
      *
      * @param iterable $iter Source data.
@@ -257,7 +272,7 @@ final class Iter
      * @param iterable $iter Source data.
      * @return Iterator
      */
-    public static function filterNulls(iterable $iter): Iterator
+    public static function removeNulls(iterable $iter): Iterator
     {
         return self::filter($iter, Func::not('is_null'));
     }
@@ -268,7 +283,7 @@ final class Iter
      * @param iterable $iter Source data.
      * @return Iterator
      */
-    public static function filterEmpty(iterable $iter): Iterator
+    public static function removeEmpty(iterable $iter): Iterator
     {
         return self::filter($iter, Func::truthy());
     }
@@ -499,8 +514,7 @@ final class Iter
     {
         $times = $times ?? INF;
         $iter = self::rewindable($iter);
-        for ($i = 0; $i < $times; $i++) {
-            $iter->rewind();
+        for ($i = 0; $i < $times; $i++, $iter->rewind()) {
             yield from $iter;
         }
     }
@@ -753,8 +767,8 @@ final class Iter
     public static function scan(iterable $iter, callable $fn, $initialValue = null): Iterator
     {
         $accumulator = $initialValue;
-        foreach ($iter as $value) {
-            $accumulator = $fn($accumulator, $value);
+        foreach ($iter as $key => $value) {
+            $accumulator = $fn($accumulator, $value, $key);
             yield $accumulator;
         }
     }
@@ -793,6 +807,37 @@ final class Iter
      * TODO
      *
      * @param iterable $iter Source data.
+     * @param callable $fn Function to apply for each item.
+     * @param array $args
+     * @return void
+     */
+    public static function applyRecursive(iterable $iter, callable $fn, array $args = []): void
+    {
+        foreach ($iter as $key => $value) {
+            if (is_iterable($value)) {
+                self::applyRecursive($value, $fn, $args);
+            } else {
+                $fn($value, $key, ...$args);
+            }
+        }
+    }
+
+    /**
+     * Prints the iterable using print_r(), but recursively converts the iterable and any sub-iterables to arrays first.
+     *
+     * @param iterable $iter Source data.
+     * @param bool $preserveKeys Set to true to keep the keys from the source.
+     * @return void
+     */
+    public static function print(iterable $iter, bool $preserveKeys = false): void
+    {
+        print_r(self::toArrayRecursive($iter, $preserveKeys));
+    }
+
+    /**
+     * TODO
+     *
+     * @param iterable $iter Source data.
      * @param resource $stream
      * @return int
      */
@@ -811,7 +856,7 @@ final class Iter
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns a single value calculated by the provided reducer function being applied to all items from the source.
+     * Returns a single value by applying the provided reducer function to all items from the source.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Reducer function.
@@ -821,6 +866,25 @@ final class Iter
     public static function reduce(iterable $iter, callable $fn, $initialValue = null)#: mixed
     {
         return self::last(self::scan($iter, $fn, $initialValue));
+    }
+
+    /**
+     * Returns a single value by recursively applying the provided reducer function to all items from the source.
+     *
+     * @param iterable $iter Source data.
+     * @param callable $fn Reducer function.
+     * @param mixed|null $initialValue The initial carry value that values are reduced onto.
+     * @return mixed
+     */
+    public static function reduceRecursive(iterable $iter, callable $fn, $initialValue = null)#: mixed
+    {
+        $accumulator = $initialValue;
+        foreach ($iter as $key => $value) {
+            $value = is_iterable($value) ? self::reduceRecursive($value, $fn, $initialValue) : $value;
+            $accumulator = $fn($accumulator, $value, $key);
+        }
+
+        return $accumulator;
     }
 
     /**
@@ -930,6 +994,28 @@ final class Iter
         return is_array($iter)
             ? ($preserveKeys ? $iter : array_values($iter))
             : iterator_to_array($iter, $preserveKeys);
+    }
+
+    /**
+     * Recursively creates an array from the provided iterable (and any sub-iterables).
+     *
+     * @param iterable $iter Source data.
+     * @param bool $preserveKeys Set to true to keep the keys from the source.
+     * @return array
+     */
+    public static function toArrayRecursive(iterable $iter, bool $preserveKeys = false): array
+    {
+        $array = [];
+        foreach ($iter as $key => $value) {
+            $value = is_iterable($value) ? self::toArrayRecursive($value, $preserveKeys) : $value;
+            if ($preserveKeys) {
+                $array[$key] = $value;
+            } else {
+                $array[] = $value;
+            }
+        }
+
+        return $array;
     }
 
     /**

@@ -15,9 +15,7 @@ namespace Jeremeamia\Iter8;
  * @method static callable drop(int $n) Get pipe-able drop operation.
  * @method static callable dropWhile(callable $fn) Get pipe-able dropWhile operation.
  * @method static callable filter(callable $fn) Get pipe-able filter operation.
- * @method static callable filterEmpty() Get pipe-able filterEmpty operation.
  * @method static callable filterKeys(callable $fn) Get pipe-able filterKeys operation.
- * @method static callable filterNulls() Get pipe-able filterNulls operation.
  * @method static callable filterWithKeys() Get pipe-able filterWithKeys operation.
  * @method static callable first() Get pipe-able first operation.
  * @method static callable flatMap(callable $fn) Get pipe-able flatMap operation.
@@ -31,12 +29,16 @@ namespace Jeremeamia\Iter8;
  * @method static callable leaves() Get pipe-able leaves operation.
  * @method static callable map(callable $fn) Get pipe-able map operation.
  * @method static callable mapKeys(callable $fn) Get pipe-able mapKeys operation.
+ * @method static callable mapRecursive(callable $fn) Get pipe-able mapRecursive operation.
  * @method static callable mapWithKeys(callable $fn) Get pipe-able mapWithKeys operation.
  * @method static callable partition(int $count) Get pipe-able chunk operation.
  * @method static callable pluck(string $key) Get pipe-able pluck operation.
  * @method static callable normalize() Get pipe-able pluck operation.
  * @method static callable reindex(callable $fn) Get pipe-able reindex operation.
+ * @method static callable removeEmpty() Get pipe-able removeEmpty operation.
+ * @method static callable removeNulls() Get pipe-able removeNulls operation.
  * @method static callable reduce(callable $fn, $initialValue = null) Get pipe-able reduce operation.
+ * @method static callable reduceRecursive(callable $fn, $initialValue = null) Get pipe-able reduceRecursive operation.
  * @method static callable replaceKeys(iterable $keys) Get pipe-able replaceKeys operation.
  * @method static callable replaceValues(iterable $values) Get pipe-able replaceValues operation.
  * @method static callable replay(?int $times = null) Get pipe-able replay operation.
@@ -48,6 +50,7 @@ namespace Jeremeamia\Iter8;
  * @method static callable takeWhile(callable $fn) Get pipe-able takeWhile operation.
  * @method static callable tap(callable $fn) Get pipe-able tap operation.
  * @method static callable toArray() Get pipe-able toArray operation.
+ * @method static callable toArrayRecursive() Get pipe-able toArrayRecursive operation.
  * @method static callable toIter() Get pipe-able toIter operation.
  * @method static callable toKeyPairs() Get pipe-able mapToKeyPairs operation.
  * @method static callable toStream() Get pipe-able toStream operation.

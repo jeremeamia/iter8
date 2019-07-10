@@ -34,7 +34,7 @@ const PEOPLE = [
     ['name' => 'Benny', 'age' => 21],
     ['name' => 'Cally', 'age' => 22],
     ['name' => 'Danny', 'age' => 24],
-    ['name' => 'Danny', 'age' => 23],
+    ['name' => 'Danny', 'age' => 24],
     ['name' => 'Eddy',  'age' => 18],
 ];
 ```
@@ -50,7 +50,7 @@ $iter = Iter::filter($iter, Func::compose([
 $iter = Iter::map($iter, Func::index('name'));
 $iter = Iter::debounce($iter);
 
-print_r(Iter::toArray($iter));
+Iter::print($iter);
 #> ['Benny', 'Cally', 'Danny']
 ```
 
@@ -66,7 +66,7 @@ $iter = Iter::pipe(Gen::from(PEOPLE), [
     Pipe::debounce(),
 ]);
 
-print_r(Iter::toArray($iter));
+Iter::print($iter);
 #> ['Benny', 'Cally', 'Danny']
 ```
 
@@ -81,7 +81,7 @@ $collection = Collection::from(PEOPLE)
     ->map(Func::index('name'))
     ->debounce();
 
-print_r(Iter::toArray($collection));
+Iter::print($collection);
 #> ['Benny', 'Cally', 'Danny']
 ```
 
