@@ -1,5 +1,9 @@
 # Iter8
 
+[![Made with Love](https://img.shields.io/badge/made_with-♥-ff69b4.svg)](https://github.com/jeremeamia/iter8/graphs/contributors)
+[![Coded in PHP](https://img.shields.io/badge/code-php-8892bf.svg)](http://php.net/)
+[![CircleCI](https://circleci.com/gh/jeremeamia/iter8/tree/master.svg?style=svg)](https://circleci.com/gh/jeremeamia/iter8/tree/master)
+
 ## Introduction
 
 Iter8 is a PHP library for generator and functional operations.
