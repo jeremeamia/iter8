@@ -212,4 +212,24 @@ final class Gen
             yield $buffer;
         }
     }
+
+    /**
+     * Creates a "Regenerator", which is a rewindable generator that rewinds by regenerating the values.
+     *
+     * Example:
+     *
+     *     $iter = Gen::regen(function () { yield 'a'; yield 'b'; yield 'c'; });
+     *     for ($i = 0; $i < 3; $i++) {
+     *         foreach ($iter as $value) { echo $value; }
+     *     }
+     *     #> abcabcabc
+     *
+     * @param callable $fn Generator function for producing values.
+     * @param array $args Args for the Generator function.
+     * @return Iterator
+     */
+    public static function regen(callable $fn, array $args = []): Iterator
+    {
+        return new Regenerator($fn, $args);
+    }
 }

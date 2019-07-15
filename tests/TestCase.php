@@ -12,7 +12,7 @@ abstract class TestCase extends PhpUnitTestCase
 {
     protected function assertIterable(array $expected, iterable $iter, bool $preserveKeys = false): void
     {
-        $actual = Iter::toArray($iter, $preserveKeys);
+        $actual = Iter::toArrayRecursive($iter, $preserveKeys);
         $this->assertEquals($expected, $actual);
     }
 

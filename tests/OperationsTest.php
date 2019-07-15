@@ -71,32 +71,19 @@ class OperationsTest extends TestCase
 
     public function provideOperationTestCases()
     {
-        yield 'chunk' => [
-            'chunk',
-            Iter::toIter([1, 2, 3, 4, 5, 6, 7, 8]),
-            [3],
-            [[1, 2, 3], [4, 5, 6], [7, 8]]
-        ];
-
-        yield 'drop' => [
-            'drop',
-            Iter::toIter([1, 2, 3, 4, 5]),
-            [2],
-            [3, 4, 5]
-        ];
-
-        yield 'filter' => [
-            'filter',
-            Iter::toIter([1, 2, 3, 4, 5]),
-            [Func::even()],
-            [2, 4]
-        ];
-
         yield 'map' => [
             'map',
             Iter::toIter([1, 2, 3]),
             [Func::operator('*', 2)],
             [2, 4, 6]
+        ];
+
+        yield 'mapRecursive' => [
+            'mapRecursive',
+            Iter::toIter(['a' => 1, 'b' => ['c' => 2, 'd' => ['e' => 3]]]),
+            [Func::operator('*', 2)],
+            ['a' => 2, 'b' => ['c' => 4, 'd' => ['e' => 6]]],
+            Iter::PRESERVE_KEYS
         ];
 
         yield 'mapWithKeys' => [
@@ -177,18 +164,11 @@ class OperationsTest extends TestCase
             Iter::PRESERVE_KEYS
         ];
 
-        yield 'replay' => [
-            'replay',
-            Iter::toIter([1, 2, 3]),
-            [3],
-            [1, 2, 3, 1, 2, 3, 1, 2, 3]
-        ];
-
-        yield 'scan' => [
-            'scan',
-            Iter::toIter([1, 2, 3, 4]),
-            [Func::operator('*'), 1],
-            [1, 2, 6, 24]
+        yield 'filter' => [
+            'filter',
+            Iter::toIter([1, 2, 3, 4, 5]),
+            [Func::even()],
+            [2, 4]
         ];
 
         yield 'take' => [
@@ -198,6 +178,34 @@ class OperationsTest extends TestCase
             [1, 2, 3]
         ];
 
+        yield 'drop' => [
+            'drop',
+            Iter::toIter([1, 2, 3, 4, 5]),
+            [2],
+            [3, 4, 5]
+        ];
+
+        yield 'chunk' => [
+            'chunk',
+            Iter::toIter([1, 2, 3, 4, 5, 6, 7, 8]),
+            [3],
+            [[1, 2, 3], [4, 5, 6], [7, 8]]
+        ];
+
+        yield 'partition' => [
+            'partition',
+            Iter::toIter([1, 2, 3, 4, 5, 6, 7, 8]),
+            [3],
+            [[1, 4, 7], [2, 5, 8], [3, 6]]
+        ];
+
+        yield 'replay' => [
+            'replay',
+            Iter::toIter([1, 2, 3]),
+            [3],
+            [1, 2, 3, 1, 2, 3, 1, 2, 3]
+        ];
+
         yield 'concat' => [
             'concat',
             Iter::toIter([1, 2, 3]),
@@ -205,11 +213,76 @@ class OperationsTest extends TestCase
             [1, 2, 3, 4, 5, 6, 7, 8, 9]
         ];
 
+        yield 'combineLatest' => [
+            'combineLatest',
+            Iter::toIter([1, 2, 3]),
+            [Iter::toIter([4, 5, 6]), Iter::toIter([7, 8, 9])],
+            [3, 6, 9]
+        ];
+
+        yield 'flatMap' => [
+            'flatMap',
+            Iter::toIter(['abc', 'def', 'ghi']),
+            ['str_split'],
+            ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+        ];
+
+        yield 'flattenOneLevel' => [
+            'flatten',
+            Iter::toIter([1, [2, [3, 4], [[5]], 6], 7]),
+            [1],
+            [1, 2, [3, 4], [[5]], 6, 7]
+        ];
+
+        yield 'flattenTwoLevels' => [
+            'flatten',
+            Iter::toIter([1, [2, [3, 4], [[5]], 6], 7]),
+            [2],
+            [1, 2, 3, 4, [5], 6, 7]
+        ];
+
+        yield 'leaves' => [
+            'leaves',
+            Iter::toIter([1, [2, [3, 4], [[5]], 6], 7]),
+            [],
+            [1, 2, 3, 4, 5, 6, 7]
+        ];
+
         yield 'zip' => [
             'zip',
             Iter::toIter([1, 4, 7]),
             [Iter::toIter([2, 5, 8]), Iter::toIter([3, 6, 9])],
             [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        ];
+
+        yield 'interpose' => [
+            'interpose',
+            Iter::toIter([1, 2, 3]),
+            [','],
+            [1, ',', 2, ',', 3]
+        ];
+
+        yield 'replaceKeys' => [
+            'replaceKeys',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [['x', 'y', 'z']],
+            ['x' => 1, 'y' => 2, 'z' => 3],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'replaceValues' => [
+            'replaceValues',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]),
+            [[7, 8, 9]],
+            ['a' => 7, 'b' => 8, 'c' => 9],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'scan' => [
+            'scan',
+            Iter::toIter([1, 2, 3, 4]),
+            [Func::operator('*'), 1],
+            [1, 2, 6, 24]
         ];
     }
 }
