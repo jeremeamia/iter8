@@ -16,7 +16,7 @@ class Regenerator implements OuterIterator
     /** @var array */
     private $args;
 
-    /** @var Iterator */
+    /** @var Iterator|null */
     private $iter;
 
     /**
@@ -27,11 +27,12 @@ class Regenerator implements OuterIterator
     {
         $this->fn = $fn;
         $this->args = $args;
+        $this->iter = null;
     }
 
     public function getInnerIterator(): Iterator
     {
-        if (!$this->iter) {
+        if ($this->iter === null) {
             $this->iter = ($this->fn)(...$this->args);
         }
 
