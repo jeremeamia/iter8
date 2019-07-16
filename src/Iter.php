@@ -88,7 +88,11 @@ final class Iter
      *
      * Example:
      *
-     *     $iter = Iter::reindex([['id' => 'a', 'name' => 'Alice'], ['id' => 'b', 'name' => 'Bob']], Func::index('id'));
+     *     $iter = Iter::reindex([
+     *         ['id' => 'a', 'name' => 'Alice'],
+     *         ['id' => 'b', 'name' => 'Bob']
+     *     ], Func::index('id'));
+     *     Iter::print($iter);
      *     #> ['a' => ['id' => 'a', 'name' => 'Alice'], 'b' => ['id' => 'b', 'name' => 'Bob']]
      *
      * @param iterable $iter Source data.
@@ -108,7 +112,13 @@ final class Iter
      *
      * Example:
      *
-     *     $iter = Iter::pluck([['name' => 'Jeremy'], ['name' => 'Penny'], ['name' => 'Joey']], 'name');
+     *     $iter = Iter::pluck([
+     *         ['name' => 'Jeremy'],
+     *         ['name' => 'Penny'],
+     *         ['name' => 'Joey']
+     *     ], 'name');
+
+     *     Iter::print($iter);
      *     #> ['Jeremy', 'Penny', 'Joey']
      *
      * @param iterable $iter Source data. Assumes that the data is a list of homogeneous associative arrays.
@@ -127,6 +137,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::toKeyPairs(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     Iter::print($iter);
      *     #> [['a', 1], ['b', 2], ['c', 3]]
      *
      * @param iterable $iter Source data.
@@ -145,6 +156,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::fromKeyPairs([['a', 1], ['b', 2], ['c', 3]]);
+     *     Iter::print($iter);
      *     #> ['a' => 1, 'b' => 2, 'c' => 3]
      *
      * @param iterable $iter Source data.
@@ -163,6 +175,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::keys(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     Iter::print($iter);
      *     #> ['a', 'b', 'c']
      *
      * @param iterable $iter Source data.
@@ -182,6 +195,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::values(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     Iter::print($iter);
      *     #> [1, 2, 3]
      *
      * @param iterable $iter Source data.
@@ -201,6 +215,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::flip(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     Iter::print($iter);
      *     #> [1 => 'a', 2 => 'b', 3 => 'c']
      *
      * @param iterable $iter Source data.
@@ -224,6 +239,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::filter([1, 2, 3, 4, 5], Func::even());
+     *     Iter::print($iter);
      *     #> [2, 4]
      *
      * @param iterable $iter Source data.
@@ -250,6 +266,7 @@ final class Iter
      *         ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5],
      *         function (int $value, string $key) { return $key === 'b' || $value > 3; }
      *     );
+     *     Iter::print($iter);
      *     #> ['b' => 2, 'd' => 4, 'e' => 5]
      *
      * @param iterable $iter Source data.
@@ -470,6 +487,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::chunk([1, 2, 3, 4, 5, 6, 7], 2);
+     *     Iter::print($iter);
      *     #> [[1, 2], [3, 4], [5, 6], [7]]
      *
      * @param iterable $iter Source data.
@@ -501,6 +519,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::partition([1, 2, 3, 4, 5, 6, 7], 3);
+     *     Iter::print($iter);
      *     #> [[1, 4, 7], [2, 5], [3, 6]]
      *
      * @param iterable $iter Source data.
@@ -528,6 +547,7 @@ final class Iter
      * Example:
      *
      *     $iter = Iter::replay([1, 2, 3], 3);
+     *     Iter::print($iter);
      *     #> [1, 2, 3, 1, 2, 3, 1, 2, 3]
      *
      * @param iterable $iter Source data.
@@ -544,7 +564,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable by appending/concatenating all of the source iterables together.
      *
      * @param iterable $iter Source data.
      * @param iterable ...$iters Additional iterables of source data.
@@ -559,7 +579,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable by taking only the last value from all of the source iterables.
      *
      * @param iterable $iter Source data.
      * @param iterable ...$iters Additional iterables of source data.
@@ -574,7 +594,7 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable where a mapper function is applied that produces iterables that get flattened back up.
+     * Creates a new iterable where a mapper function is applied that produces iterables that get flattened back up.
      *
      * @param iterable $iter Source data. Assumed to be an iterable of iterables.
      * @param callable $fn Mapping function.
@@ -588,7 +608,7 @@ final class Iter
     }
 
     /**
-     * Flattens nested iterables in the source iterable down into a new iterable.
+     * Creates a new iterable where nested iterables in the source iterable are flattened down one or more levels.
      *
      * @param iterable $iter Source data. Assumes that some items may also be iterable.
      * @param int $levels The number of levels to recurse.
@@ -612,7 +632,7 @@ final class Iter
     }
 
     /**
-     * Flattens all the leaves recursively in a tree-structured source iterable down into a new iterable.
+     * Creates a new iterable where all the leaf nodes from the tree-structured source iterable are flattened down.
      *
      * @param iterable $iter Source data. Assumes that some items (included deeply nested ones) may also be iterable.
      * @return Iterator
@@ -629,7 +649,9 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where items from the source iterables are combined together in a round-robin style.
+     *
+     * Note: The length of the resulting Iterator will be the minimum of the lengths of the input iterables.
      *
      * @param iterable $iter Source data.
      * @param iterable ...$iters
@@ -650,7 +672,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where items from the source iterable have a separator injected between them.
      *
      * @param iterable $iter Source data.
      * @param mixed $separator
@@ -667,9 +689,9 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where the keys from the source iterable are replaced with the provided keys.
      *
-     * Note: The length of the resulting Iterator will be the minimum length of the two input iterables.
+     * Note: The length of the resulting Iterator will be the minimum of the lengths of the input iterables.
      *
      * @param iterable $iter Source data.
      * @param iterable $keys Replacement keys.
@@ -689,9 +711,9 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where the values from the source iterable are replaced with the provided values.
      *
-     * Note: The length of the resulting Iterator will be the minimum length of the two input iterables.
+     * Note: The length of the resulting Iterator will be the minimum of the lengths of the input iterables.
      *
      * @param iterable $iter Source data.
      * @param iterable $values Replacement $values.
@@ -729,7 +751,7 @@ final class Iter
     }
 
     /**
-     * Creates a new iterable where source data is piped through one or more transformative operations.
+     * Creates a new iterable where source iterable's data is piped through one or more transformative operations.
      *
      * Piping allows for the a more natural reading order of operations when multiple operations are being applied to an
      * iterable. Instead of consecutive wrappings of iterables that result in an "inside-out" order of operations,
@@ -760,12 +782,14 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Validates each value from the source iterable using the provided validation function.
+     *
+     * A ValidationException is thrown if an invalid value is encountered.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Predicate function.
      * @return Iterator
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validate(iterable $iter, callable $fn): Iterator
     {
@@ -779,9 +803,7 @@ final class Iter
     }
 
     /**
-     * TODO
-     *
-     * aka "reductions"
+     * Creates a new iterable where each value reflects a stage in a "reduce" operation of the source iterable.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Reducer function.
@@ -798,7 +820,7 @@ final class Iter
     }
 
     /**
-     * Creates a new iterator that resumes from from a partially-consumed iterator without rewinding.
+     * Creates a new iterable that resumes from from a partially-consumed iterator without rewinding.
      *
      * @param Iterator $iter
      * @return Iterator
@@ -813,7 +835,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Applies a function to every item in the source iterable.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Function to apply for each item.
@@ -828,7 +850,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Applies a function recursively to every item in the source iterable, such that it is applied to every leaf node.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Function to apply for each item.
@@ -859,7 +881,14 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Reads items from the source iterable and writes them into the provided stream.
+     *
+     * Example:
+     *
+     *     $file = fopen('names.txt', 'w+');
+     *     $iter = Iter::map(['Jeremy', 'Penny', 'Joey'], Func::suffix("\n"));
+     *     Iter::streamTo($iter, $file);
+     *     fclose($file);
      *
      * @param iterable $iter Source data.
      * @param resource $stream

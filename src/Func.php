@@ -9,6 +9,8 @@ use UnexpectedValueException;
  */
 final class Func
 {
+    public const PLACEHOLDER = "\0_\0";
+
     /**
      * Creates a callable that will call the specified method (with the specified args) for a provided object.
      *
@@ -187,6 +189,66 @@ final class Func
     }
 
     /**
+     * Creates a callable that wraps a string value with other string values.
+     *
+     * Example:
+     *
+     *     $fn = Func::wrap('{', '}');
+     *     $fn('foo')
+     *     #> {foo}
+     *
+     *     $fn = Func::wrap('*');
+     *     $fn('foo')
+     *     #> *foo*
+     *
+     * @param string $prefix
+     * @param null|string $suffix
+     * @return callable
+     */
+    public static function wrap(string $prefix, ?string $suffix = null): callable
+    {
+        $suffix = $suffix ?? $prefix;
+
+        return function ($value) use ($prefix, $suffix) {
+            return "{$prefix}{$value}{$suffix}";
+        };
+    }
+
+    /**
+     * Creates a callable that prefixes a string value with another string value.
+     *
+     * Example:
+     *
+     *     $fn = Func::prefix('$');
+     *     $fn('foo')
+     *     #> $foo
+     *
+     * @param string $prefix
+     * @return callable
+     */
+    public static function prefix(string $prefix): callable
+    {
+        return self::wrap($prefix, '');
+    }
+
+    /**
+     * Creates a callable that suffixes a string value with another string value.
+     *
+     * Example:
+     *
+     *     $fn = Func::suffix('$');
+     *     $fn('foo')
+     *     #> foo$
+     *
+     * @param string $suffix
+     * @return callable
+     */
+    public static function suffix(string $suffix): callable
+    {
+        return self::wrap('', $suffix);
+    }
+
+    /**
      * Creates a callable that is a composition of the provided callable unary functions.
      *
      * The main use case in this lib is for iterable transformation functions, but it's technically generic.
@@ -213,6 +275,31 @@ final class Func
             }
 
             return $data;
+        };
+    }
+
+    /**
+     * Performs a partial function application of the provided callable to create a unary version of the callable.
+     *
+     * The args list should include the set of fixed args to apply and one instance of the `Func::PLACEHOLDER` constant
+     * to mark where the unary argument should be injected.
+     *
+     * Example:
+     *
+     *     $explodeOnPipe = Func::apply('explode', ['|', Func::PLACEHOLDER]);
+     *     $explodeOnPipe('a|b|c');
+     *     #> ['a', 'b', 'c']
+     *
+     * @param callable $fn
+     * @param array $args
+     * @return callable
+     */
+    public static function apply(callable $fn, array $args): callable
+    {
+        return function ($unaryArg) use ($fn, $args) {
+            $index = array_search(self::PLACEHOLDER, $args, true);
+            $args[$index] = $unaryArg;
+            return $fn(...$args);
         };
     }
 
