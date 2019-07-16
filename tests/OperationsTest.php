@@ -171,6 +171,14 @@ class OperationsTest extends TestCase
             [2, 4]
         ];
 
+        yield 'filterWithKeys' => [
+            'filterWithKeys',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+            [function (int $value, string $key) { return $key === 'b' || $value > 3; }],
+            ['b' => 2, 'd' => 4, 'e' => 5],
+            Iter::PRESERVE_KEYS
+        ];
+
         yield 'take' => [
             'take',
             Iter::toIter([1, 2, 3, 4, 5]),

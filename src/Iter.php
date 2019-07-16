@@ -162,7 +162,7 @@ final class Iter
      *
      * Example:
      *
-     *     $iter = Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     $iter = Iter::keys(['a' => 1, 'b' => 2, 'c' => 3]);
      *     #> ['a', 'b', 'c']
      *
      * @param iterable $iter Source data.
@@ -181,7 +181,7 @@ final class Iter
      *
      * Example:
      *
-     *     $iter = Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     $iter = Iter::values(['a' => 1, 'b' => 2, 'c' => 3]);
      *     #> [1, 2, 3]
      *
      * @param iterable $iter Source data.
@@ -200,7 +200,7 @@ final class Iter
      *
      * Example:
      *
-     *     $iter = Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3]);
+     *     $iter = Iter::flip(['a' => 1, 'b' => 2, 'c' => 3]);
      *     #> [1 => 'a', 2 => 'b', 3 => 'c']
      *
      * @param iterable $iter Source data.
@@ -219,11 +219,17 @@ final class Iter
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns a new iterable with items filtered out from the source by the filter function.
+     * Creates a new iterable where items are filtered out from the source by the filter function.
+     *
+     * Example:
+     *
+     *     $iter = Iter::filter([1, 2, 3, 4, 5], Func::even());
+     *     #> [2, 4]
      *
      * @param iterable $iter Source data.
      * @param callable $fn Filter function (i.e., predicate).
      * @return Iterator
+     * @see array_filter()
      */
     public static function filter(iterable $iter, callable $fn): Iterator
     {
@@ -235,11 +241,21 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable with items filtered out by the filter function, which is called with both the value & key.
+     * Creates a new iterable where items are filtered out from the source by the filter function, which is called with
+     * both the value and key.
+     *
+     * Example:
+     *
+     *     $iter = Iter::filterWithKeys(
+     *         ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5],
+     *         function (int $value, string $key) { return $key === 'b' || $value > 3; }
+     *     );
+     *     #> ['b' => 2, 'd' => 4, 'e' => 5]
      *
      * @param iterable $iter Source data.
      * @param callable $fn Filter function (i.e., predicate).
      * @return Iterator
+     * @see array_filter()
      */
     public static function filterWithKeys(iterable $iter, callable $fn): Iterator
     {
@@ -251,11 +267,12 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable with items filtered out from the source by applying the filter function to the keys.
+     * Creates a new iterable where items are filtered out from the source by applying the filter function to the keys.
      *
      * @param iterable $iter Source data.
      * @param callable $fn Filter function (i.e., predicate).
      * @return Iterator
+     * @see array_filter()
      */
     public static function filterKeys(iterable $iter, callable $fn): Iterator
     {
@@ -267,10 +284,11 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where null items are filtered out from the source.
      *
      * @param iterable $iter Source data.
      * @return Iterator
+     * @see array_filter()
      */
     public static function removeNulls(iterable $iter): Iterator
     {
@@ -278,10 +296,11 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where empty (i.e., falsey) items are filtered out from the source.
      *
      * @param iterable $iter Source data.
      * @return Iterator
+     * @see array_filter()
      */
     public static function removeEmpty(iterable $iter): Iterator
     {
@@ -289,7 +308,8 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where array-accessible items without the specified key-value pair are filtered out
+     * from the source.
      *
      * @param iterable $iter Source data.
      * @param string $key
@@ -299,16 +319,17 @@ final class Iter
     public static function where(iterable $iter, string $key, $value): Iterator
     {
         return self::filter($iter, function ($array) use ($key, $value) {
-            return array_key_exists($key, $array) && $array[$key] === $value;
+            return $value === ($array[$key] ?? null);
         });
     }
 
     /**
-     * Returns a new iterable that takes only the first $n items from the source.
+     * Creates a new iterable where only the first $n items are taken from the source.
      *
      * @param iterable $iter Source data.
      * @param int $n Number of items to take.
      * @return Iterator
+     * @see array_slice()
      */
     public static function take(iterable $iter, int $n): Iterator
     {
@@ -316,11 +337,12 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable that takes only items from the source after the first $n items are skipped.
+     * Creates a new iterable where only items after the first $n items are taken from the source.
      *
      * @param iterable $iter Source data.
      * @param int $n Number of items to drop/skip.
      * @return Iterator
+     * @see array_slice()
      */
     public static function drop(iterable $iter, int $n): Iterator
     {
@@ -328,12 +350,13 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where only a slice of items are taken from the source.
      *
      * @param iterable $iter Source data.
      * @param int $offset
      * @param int|null $length
      * @return Iterator
+     * @see array_slice()
      */
     public static function slice(iterable $iter, int $offset, ?int $length = null): Iterator
     {
@@ -366,7 +389,7 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable that takes the first items from the source until the predicate function returns false.
+     * Creates a new iterable where items are taken from the source until the predicate function returns false.
      *
      * @param iterable $iter Source data.
      * @param callable $fn predicate function.
@@ -384,7 +407,7 @@ final class Iter
     }
 
     /**
-     * Returns a new iterable that drops the first items from the source until the predicate function returns false.
+     * Creates a new iterable where items are taken from the source after the predicate function returns false.
      *
      * @param iterable $iter Source data.
      * @param callable $fn predicate function.
@@ -403,7 +426,7 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where duplicate, consecutive items are filtered out from the source.
      *
      * @param iterable $iter Source data.
      * @return Iterator
@@ -420,10 +443,11 @@ final class Iter
     }
 
     /**
-     * TODO
+     * Creates a new iterable where duplicate items are filtered out from the source.
      *
      * @param iterable $iter Source data.
      * @return Iterator
+     * @see array_unique()
      */
     public static function distinct(iterable $iter): Iterator
     {
