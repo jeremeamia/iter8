@@ -5,9 +5,9 @@ namespace Jeremeamia\Iter8\Tests;
 use Jeremeamia\Iter8\Gen;
 
 /**
- * @covers \Jeremeamia\Iter8\Regenerator
+ * @covers \Jeremeamia\Iter8\DeferredGenerator
  */
-class RegeneratorTest extends TestCase
+class DeferredGeneratorTest extends TestCase
 {
     public function testRegeneratorUsesProvidedCallableToEnableRewinding()
     {
@@ -19,7 +19,7 @@ class RegeneratorTest extends TestCase
             }
         };
 
-        $iter = Gen::regen($genFunc, [3]);
+        $iter = Gen::defer($genFunc, [3]);
 
         $results = [];
         for ($i = 0; $i < 5; $i++) {
@@ -34,7 +34,7 @@ class RegeneratorTest extends TestCase
 
     public function testRegeneratorSupportsKeys()
     {
-        $iter = Gen::regen(function () {
+        $iter = Gen::defer(function () {
             yield "a" => 1;
             yield "b" => 2;
             yield "c" => 3;

@@ -143,10 +143,21 @@ final class Gen
     /**
      * Creates an iterable that contains the values lazily created by the provided callable.
      *
+     * The resulting iterable is also "rewindable", because the rewind() operation re-executes the callable internally
+     * to create a fresh generator.
+     *
      * Example:
      *
      *     $iter = Gen::defer(function () {yield 1; yield 2, yield 3;});
      *     #> [1, 2, 3]
+     *
+     *     // Supports rewind.
+     *     for ($i = 0; $i < 3; $i++) {
+     *         foreach ($iter as $n) {
+     *             echo $n;
+     *         }
+     *     }
+     *     #> 123123123
      *
      * @param callable $fn Factory function to lazily create the iterable.
      * @param array $args Arguments to provide to the factory function.
@@ -154,7 +165,7 @@ final class Gen
      */
     public static function defer(callable $fn, array $args = []): Iterator
     {
-        yield from self::from($fn(...$args));
+        return new DeferredGenerator($fn, $args);
     }
 
     /**
@@ -211,25 +222,5 @@ final class Gen
 
             yield $buffer;
         }
-    }
-
-    /**
-     * Creates a "Regenerator", which is a rewindable generator that rewinds by regenerating the values.
-     *
-     * Example:
-     *
-     *     $iter = Gen::regen(function () { yield 'a'; yield 'b'; yield 'c'; });
-     *     for ($i = 0; $i < 3; $i++) {
-     *         foreach ($iter as $value) { echo $value; }
-     *     }
-     *     #> abcabcabc
-     *
-     * @param callable $fn Generator function for producing values.
-     * @param array $args Args for the Generator function.
-     * @return Iterator
-     */
-    public static function regen(callable $fn, array $args = []): Iterator
-    {
-        return new Regenerator($fn, $args);
     }
 }

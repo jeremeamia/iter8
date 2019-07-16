@@ -6,9 +6,13 @@ use Iterator;
 use OuterIterator;
 
 /**
- * A "Regenerator" is a rewindable generator that rewinds by regenerating the values.
+ * Encapsulates a lazily-created generator.
+ *
+ * The generator is lazily-created by the provided function and argument list. The generator is recreated every time
+ * the iterator is rewound such that even though the data source is technically a generator, the iterator can still
+ * support rewinding.
  */
-class Regenerator implements OuterIterator
+class DeferredGenerator implements OuterIterator
 {
     /** @var callable */
     private $fn;
@@ -33,7 +37,7 @@ class Regenerator implements OuterIterator
     public function getInnerIterator(): Iterator
     {
         if ($this->iter === null) {
-            $this->iter = ($this->fn)(...$this->args);
+            $this->iter = Gen::from(($this->fn)(...$this->args));
         }
 
         return $this->iter;
