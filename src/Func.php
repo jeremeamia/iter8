@@ -81,7 +81,7 @@ final class Func
      *
      *     $fn = Func::unary('strtolower');
      *     $fn('VALUE', 'KEY')
-     *     #> 'value'
+     *     #> "value"
      *
      * @param callable $fn
      * @return callable
@@ -195,11 +195,11 @@ final class Func
      *
      *     $fn = Func::wrap('{', '}');
      *     $fn('foo')
-     *     #> {foo}
+     *     #> "{foo}"
      *
      *     $fn = Func::wrap('*');
      *     $fn('foo')
-     *     #> *foo*
+     *     #> "*foo*"
      *
      * @param string $prefix
      * @param null|string $suffix
@@ -221,7 +221,7 @@ final class Func
      *
      *     $fn = Func::prefix('$');
      *     $fn('foo')
-     *     #> $foo
+     *     #> "$foo"
      *
      * @param string $prefix
      * @return callable
@@ -238,7 +238,7 @@ final class Func
      *
      *     $fn = Func::suffix('$');
      *     $fn('foo')
-     *     #> foo$
+     *     #> "foo$"
      *
      * @param string $suffix
      * @return callable
@@ -246,6 +246,25 @@ final class Func
     public static function suffix(string $suffix): callable
     {
         return self::wrap('', $suffix);
+    }
+
+    /**
+     * Creates a callable that evaluates the equality of the provided value and the functions input value.
+     *
+     * Example:
+     *
+     *     $fn = Func::eq(5);
+     *     $fn(2 + 3)
+     *     #> true
+     *
+     * @param mixed $expected
+     * @return callable
+     */
+    public static function eq($expected): callable
+    {
+        return function ($actual) use (&$expected) {
+            return $actual === $expected;
+        };
     }
 
     /**
@@ -300,6 +319,39 @@ final class Func
             $index = array_search(self::PLACEHOLDER, $args, true);
             $args[$index] = $unaryArg;
             return $fn(...$args);
+        };
+    }
+
+    /**
+     * Creates a callable that memoizes the results of the provided callable.
+     *
+     * Note: This general memoization technique requires serialization of the arguments on each call, which fairly slow.
+     * Unless the function being memoized does something much slower, then it might not be worth it.
+     *
+     * Example:
+     *
+     *     $getUser = Func::memoize([$userRepository, 'getUser']);
+     *     $user = $getUser($id);
+     *     // Does not access data source again on second call.
+     *     $userAgain = $getUser($id);
+     *
+     * @param callable $fn
+     * @return callable
+     */
+    public static function memoize(callable $fn): callable
+    {
+        $results = [];
+
+        return function(...$args) use ($fn, &$results) {
+            $hash = md5(serialize(array_map(function ($v) {
+                return is_object($v) ? spl_object_hash($v) : $v;
+            }, $args)));
+
+            if (!isset($results[$hash])) {
+                $results[$hash] = $fn(...$args);
+            }
+
+            return $results[$hash];
         };
     }
 
