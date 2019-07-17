@@ -60,7 +60,7 @@ final class Func
      *     $fn($person)
      *     # Equivalent to: $person['name']
      *
-     * @param string $index Index/key of the array to access.
+     * @param int|string $index Index/key of the array to access.
      * @param mixed|null $default A default value to return if the property is not set.
      * @return callable
      */

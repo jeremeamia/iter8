@@ -195,9 +195,9 @@ class FuncTest extends TestCase
 
     /**
      * @param string $operator
-     * @param $left
-     * @param $right
-     * @param $expected
+     * @param mixed $left
+     * @param mixed $right
+     * @param mixed $expected
      * @dataProvider provideOperatorUseCases
      */
     public function testCanCreateFuncsForOperators(string $operator, $left, $right, $expected)
