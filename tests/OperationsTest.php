@@ -286,6 +286,13 @@ class OperationsTest extends TestCase
             Iter::PRESERVE_KEYS
         ];
 
+        yield 'normalize' => [
+            'normalize',
+            [1, 2, 3, 4],
+            [],
+            [1, 2, 3, 4]
+        ];
+
         yield 'scan' => [
             'scan',
             Iter::toIter([1, 2, 3, 4]),

@@ -17,7 +17,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::method('getNestedValue', 'users.*.name');
-     *     $fn($apiResult)
+     *     $fn($apiResult);
      *     # Equivalent to: $apiResult->getNestedValue('users.*.name')
      *
      * @param string $method Name of the method to call.
@@ -37,7 +37,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::property('name');
-     *     $fn($person)
+     *     $fn($person);
      *     # Equivalent to: $person->name
      *
      * @param string $property Name of the property to access.
@@ -57,7 +57,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::index('name');
-     *     $fn($person)
+     *     $fn($person);
      *     # Equivalent to: $person['name']
      *
      * @param int|string $index Index/key of the array to access.
@@ -80,7 +80,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::unary('strtolower');
-     *     $fn('VALUE', 'KEY')
+     *     $fn('VALUE', 'KEY');
      *     #> "value"
      *
      * @param callable $fn
@@ -99,7 +99,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::truthy();
-     *     $fn(1)
+     *     $fn(1);
      *     #> true
      *
      * @return callable
@@ -117,7 +117,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::falsey();
-     *     $fn(0)
+     *     $fn(0);
      *     #> true
      *
      * @return callable
@@ -135,7 +135,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::not(function (bool $isTrue) { return $isTrue; });
-     *     $fn(true)
+     *     $fn(true);
      *     #> false
      *
      * @param callable $fn
@@ -156,7 +156,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::odd();
-     *     $fn(3)
+     *     $fn(3);
      *     #> true
      *
      * @return callable
@@ -176,7 +176,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::even();
-     *     $fn(4)
+     *     $fn(4);
      *     #> true
      *
      * @return callable
@@ -194,7 +194,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::wrap('{', '}');
-     *     $fn('foo')
+     *     $fn('foo');
      *     #> "{foo}"
      *
      *     $fn = Func::wrap('*');
@@ -220,7 +220,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::prefix('$');
-     *     $fn('foo')
+     *     $fn('foo');
      *     #> "$foo"
      *
      * @param string $prefix
@@ -237,7 +237,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::suffix('$');
-     *     $fn('foo')
+     *     $fn('foo');
      *     #> "foo$"
      *
      * @param string $suffix
@@ -254,7 +254,7 @@ final class Func
      * Example:
      *
      *     $fn = Func::eq(5);
-     *     $fn(2 + 3)
+     *     $fn(2 + 3);
      *     #> true
      *
      * @param mixed $expected
@@ -264,6 +264,25 @@ final class Func
     {
         return function ($actual) use (&$expected) {
             return $actual === $expected;
+        };
+    }
+
+    /**
+     * Creates a callable that checks if the input object is an instance of the provided class.
+     *
+     * Example:
+     *
+     *     $fn = Func::instanceOf(Exception::class);
+     *     $fn(new RuntimeException());
+     *     #> true
+     *
+     * @param string $class
+     * @return callable
+     */
+    public static function instanceOf(string $class): callable
+    {
+        return function ($object) use (&$class) {
+            return $object instanceof $class;
         };
     }
 
@@ -363,13 +382,13 @@ final class Func
      * Example (reduce):
      *
      *     $fn = Func::operator('+');
-     *     $fn(3, 7)
+     *     $fn(3, 7);
      *     #> 10
      *
      * Example (map):
      *
      *     $fn = Func::operator('+', 7);
-     *     $fn(3)
+     *     $fn(3);
      *     #> 10
      *
      * @param string $operator
@@ -410,8 +429,6 @@ final class Func
                 case '===': return $leftOperand === $rightOperand;
                 case '!==': return $leftOperand !== $rightOperand;
                 case '<=>': return $leftOperand <=> $rightOperand;
-
-                case 'instanceof': return $leftOperand instanceof $rightOperand;
 
                 default: throw new UnexpectedValueException("Unexpected operator: {$operator}");
             }

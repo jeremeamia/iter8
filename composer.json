@@ -20,6 +20,10 @@
     "psr-4": { "Jeremeamia\\Iter8\\Tests\\": "tests/" }
   },
   "scripts": {
+    "ci": [
+      "@test-ci",
+      "@stan"
+    ],
     "docs-codesniffer": "open https://github.com/squizlabs/PHP_CodeSniffer/wiki",
     "docs-composer": "open https://getcomposer.org/doc/",
     "docs-phpunit": "open https://phpunit.readthedocs.io/en/latest/",

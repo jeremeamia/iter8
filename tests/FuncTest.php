@@ -137,6 +137,12 @@ class FuncTest extends TestCase
         $this->assertTrue($fn(2 + 3));
     }
 
+    public function testCanCreateFuncToCheckInstanceOf()
+    {
+        $fn = Func::instanceOf(\Exception::class);
+        $this->assertTrue($fn(new \RuntimeException()));
+    }
+
     public function testCanComposeFuncsTogether()
     {
         $fn = Func::compose([Func::index('age'), Func::operator('>=', 20)]);
@@ -215,9 +221,38 @@ class FuncTest extends TestCase
             ['-', 5, 3, 2],
             ['/', 9, 3, 3],
             ['%', 9, 5, 4],
-            // @TODO other operators
+            ['|', 5, 3, 7],
+            ['&', 5, 3, 1],
+            ['^', 5, 3, 6],
+            ['>', 9, 5, true],
+            ['<', 9, 5, false],
+            ['.', 'a', 'b', 'ab'],
+            ['==', 5, '5', true],
+            ['!=', 5, '5', false],
+            ['>=', 9, 5, true],
+            ['<=', 9, 5, false],
+            ['&&', true, false, false],
+            ['||', true, false, true],
+            ['**', 5, 2, 25],
+            ['>>', 5, 2, 1],
+            ['<<', 5, 2, 20],
+            ['===', 5, 5, true],
+            ['!==', 5, 5, false],
+            ['<=>', 5, 2, 1],
         ], Func::index(0));
     }
 
-    // @TODO two exception cases for Func::operator
+    public function testThrowsErrorIfOperatorFuncUsedWithout2ndArg()
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $fn = Func::operator('+');
+        $fn(3);
+    }
+
+    public function testThrowsErrorIfOperatorFuncUsedWithInvalidOperator()
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $fn = Func::operator('foo');
+        $fn(3, 4);
+    }
 }
