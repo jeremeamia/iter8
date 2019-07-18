@@ -85,7 +85,7 @@ $collection = Collection::from(PEOPLE)
     ->map(Func::index('name'))
     ->debounce();
 
-Iter::print($collection);
+$collection->print();
 #> ['Benny', 'Cally', 'Danny']
 ```
 

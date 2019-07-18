@@ -10,7 +10,9 @@ use OuterIterator;
 /**
  * Wraps an iterator to make it rewindable.
  *
- * The first iteration "caches" its data for subsequent iterations into a new, internal ArrayIterator.
+ * The first iteration "caches" its data for subsequent iterations into a new internal iterator. The internal iterator
+ * is converted to an iterator where tuples of keys and values are emitted. This allows rewinding iterables whose keys
+ * can be duplicates (such as those from yield from).
  */
 class RewindableIterator implements OuterIterator, Countable
 {
