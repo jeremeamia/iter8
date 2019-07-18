@@ -3,12 +3,11 @@
 namespace Jeremeamia\Iter8;
 
 use Iterator;
-use IteratorIterator;
 
 /**
  * Collection object that encapsulates an iterable and exposes chainable iterable transformation operations.
  *
- * This class uses __call() and __callStatic() to apply operations from the Iter class.
+ * This class uses __call() and __callStatic() to apply operations from the Iter and Gen classes.
  *
  * @method static Collection defer(callable $fn, array $args = []) Create a collection using the Gen::defer operation.
  * @method static Collection empty() Create a collection using the Gen::empty operation.
@@ -79,37 +78,8 @@ use IteratorIterator;
  * @method resource toStream() Convert the collection to another format using the Iter::toStream operation.
  * @method string toString() Convert the collection to another format using the Iter::toString operation.
  */
-class Collection extends IteratorIterator
+class Collection extends RewindableIterator
 {
-    /** @var bool Keeps track of whether the Collection has already been consumed. */
-    private $consumed = false;
-
-    /**
-     * Create a new Collection from any iterable.
-     *
-     * @param iterable $data
-     * @return Collection
-     */
-    public static function new(iterable $data): self
-    {
-        return new static($data instanceof self ? $data->getInnerIterator() : Iter::toIter($data));
-    }
-
-    /**
-     * @param Iterator $data
-     */
-    public function __construct(Iterator $data)
-    {
-        parent::__construct($data);
-    }
-
-    public function rewind(): void
-    {
-        $this->errorIfConsumed();
-        parent::rewind();
-        $this->markAsConsumed();
-    }
-
     public static function __callStatic(string $method, array $args)
     {
         return new static(Gen::$method(...$args));
@@ -117,13 +87,10 @@ class Collection extends IteratorIterator
 
     public function __call(string $method, array $args)
     {
-        $this->errorIfConsumed();
-        $result = Iter::{$method}($this->getInnerIterator(), ...$args);
+        $result = Iter::{$method}($this, ...$args);
 
         if ($result instanceof Iterator) {
             $result = new static($result);
-        } else {
-            $this->markAsConsumed();
         }
 
         return $result;
@@ -131,39 +98,11 @@ class Collection extends IteratorIterator
 
     public function __toString(): string
     {
-        $this->errorIfConsumed();
-        $this->markAsConsumed();
-
-        return Iter::toString($this->getInnerIterator());
+        return Iter::toString($this);
     }
 
     public function __debugInfo(): array
     {
-        $this->errorIfConsumed();
-        $this->markAsConsumed();
-
-        return Iter::toArray($this->getInnerIterator());
-    }
-
-    /**
-     * Used to throw an exception if the collection has already been consumed (e.g., iterated).
-     *
-     * This is to prevent calling rewind on the underlying generator.
-     *
-     * @throws AlreadyConsumedException
-     */
-    private function errorIfConsumed(): void
-    {
-        if ($this->consumed) {
-            throw AlreadyConsumedException::new();
-        }
-    }
-
-    /**
-     * Marks this collection as being consumed.
-     */
-    private function markAsConsumed(): void
-    {
-        $this->consumed = true;
+        return ['data' => Iter::toArray($this)];
     }
 }

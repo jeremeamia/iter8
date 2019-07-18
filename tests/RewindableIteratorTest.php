@@ -34,7 +34,7 @@ class RewindableIteratorTest extends TestCase
         $this->assertSame(0, $iter->key());
 
         $iterator = $iter->getInnerIterator();
-        $this->assertEquals([1, 2, 3], iterator_to_array($iterator));
+        $this->assertEquals([[0, 1], [1, 2], [2, 3]], iterator_to_array($iterator));
     }
 
     public function testRewindableIsCountable()

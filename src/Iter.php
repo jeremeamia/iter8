@@ -1086,24 +1086,16 @@ final class Iter
      * Creates a string from the provided iterable.
      *
      * @param iterable $iter Source data.
-     * @param bool $buffer
      * @return string
      */
-    public static function toString(iterable $iter, bool $buffer = false): string
+    public static function toString(iterable $iter): string
     {
-        if ($buffer) {
-            $buffer = self::toStream($iter);
-            $string = stream_get_contents($buffer);
-            fclose($buffer);
-
-            if ($string === false) {
-                throw new RuntimeException('Failed to get stream contents.');
-            }
-
-            return $string;
+        $string = '';
+        foreach ($iter as $value) {
+            $string .= $value;
         }
 
-        return self::implode($iter, '');
+        return $string;
     }
 
     /**
@@ -1133,7 +1125,7 @@ final class Iter
      */
     public static function rewindable(iterable $iter): RewindableIterator
     {
-        return RewindableIterator::new($iter);
+        return new RewindableIterator($iter);
     }
 
     /**
@@ -1144,6 +1136,6 @@ final class Iter
      */
     public static function collection(iterable $iter): Iterator
     {
-        return Collection::new($iter);
+        return new Collection($iter);
     }
 }

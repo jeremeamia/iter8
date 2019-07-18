@@ -209,13 +209,17 @@ final class Gen
      *     #> ['Ther', 'e is', ' dat', 'a he', 're.']
      *
      * @param resource $stream Source stream.
-     * @param int $bufferSize Number of bytes to read from the stream at a time.
-     * @return \Generator
+     * @param int $bufferSize Max number of bytes to read from the stream at a time.
+     * @param string|null $lineEnding If provided, reading will stop at the first occurrence of these bytes.
+     * @return Iterator
      */
-    public static function fromStream(&$stream, int $bufferSize = 8 * self::KB)
+    public static function fromStream(&$stream, int $bufferSize = 8 * self::KB, ?string $lineEnding = null): Iterator
     {
+        $args = [Func::PLACEHOLDER, $bufferSize, $lineEnding];
+        $read = Func::apply('stream_get_line', $lineEnding ? $args : array_slice($args, 0, 2));
+
         while (!feof($stream)) {
-            $buffer = fread($stream, $bufferSize);
+            $buffer = $read($stream);
             if ($buffer === false || $buffer === '') {
                 break;
             }

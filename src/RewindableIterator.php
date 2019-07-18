@@ -20,26 +20,19 @@ class RewindableIterator implements OuterIterator, Countable
     /** @var ArrayIterator|null */
     private $cache;
 
-    /**
-     * Creates a RewindableIterator from the provided iterable.
-     *
-     * @param iterable $iter
-     * @return static
-     */
-    public static function new(iterable $iter): RewindableIterator
+    public function __construct(iterable $iter)
     {
-        return new static(is_array($iter) ? new ArrayIterator($iter) : Iter::toIter($iter));
-    }
-
-    public function __construct(Iterator $iterator)
-    {
-        $this->iterator = $iterator;
-        $this->cache = $iterator instanceof ArrayIterator ? null : new ArrayIterator();
+        if ($iter instanceof static) {
+            $this->iterator = $iter->getInnerIterator();
+        } else {
+            $this->iterator = Iter::toKeyPairs($iter);
+            $this->cache = new ArrayIterator();
+        }
     }
 
     public function getInnerIterator(): ArrayIterator
     {
-        while ($this->cache) {
+        if ($this->cache) {
             $this->rewind();
         }
 
@@ -51,14 +44,13 @@ class RewindableIterator implements OuterIterator, Countable
 
     public function current()#: mixed
     {
-        $key = $this->iterator->key();
-        $item = $this->iterator->current();
+        $tuple = $this->iterator->current();
 
-        if ($this->cache && !isset($this->cache[$key])) {
-            $this->cache[$key] = $item;
+        if ($this->cache) {
+            $this->cache[$this->iterator->key()] = $tuple;
         }
 
-        return $item;
+        return $tuple[1];
     }
 
     public function next(): void
@@ -68,13 +60,13 @@ class RewindableIterator implements OuterIterator, Countable
 
     public function key()#: mixed
     {
-        $key = $this->iterator->key();
+        $tuple = $this->iterator->current();
 
-        if ($this->cache && !isset($this->cache[$key])) {
-            $this->cache[$key] = $this->iterator->current();
+        if ($this->cache) {
+            $this->cache[$this->iterator->key()] = $tuple;
         }
 
-        return $key;
+        return $tuple[0];
     }
 
     public function valid(): bool

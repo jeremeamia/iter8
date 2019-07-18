@@ -45,7 +45,7 @@ class OperationsTest extends TestCase
         array $expectedOutput,
         bool $preserveKeys = false
     ) {
-        $actualOutput = (Pipe::{$operation}(...$inputArgs))($inputIter);
+        $actualOutput = Iter::pipe($inputIter, [Pipe::{$operation}(...$inputArgs)]);
         $this->assertIterable($expectedOutput, $actualOutput, $preserveKeys);
     }
 
@@ -64,7 +64,7 @@ class OperationsTest extends TestCase
         array $expectedOutput,
         bool $preserveKeys = false
     ) {
-        $actualOutput = Collection::new($inputIter)->{$operation}(...$inputArgs);
+        $actualOutput = Iter::collection($inputIter)->{$operation}(...$inputArgs);
         $this->assertInstanceOf(Collection::class, $actualOutput);
         $this->assertIterable($expectedOutput, $actualOutput, $preserveKeys);
     }

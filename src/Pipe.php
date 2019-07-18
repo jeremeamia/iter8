@@ -81,7 +81,7 @@ final class Pipe
      * @param callable $fn Function to map the value to a new iterable.
      * @return callable
      */
-    public static function switchMap(callable $fn): callable
+    public static function switch(callable $fn): callable
     {
         return function ($value) use (&$fn) {
             return Gen::from($fn($value));
