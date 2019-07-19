@@ -16,7 +16,7 @@ class MultiOperationTest extends TestCase
         ['name' => 'Benny', 'age' => 21],
         ['name' => 'Cally', 'age' => 22],
         ['name' => 'Danny', 'age' => 24],
-        ['name' => 'Danny', 'age' => 23],
+        ['name' => 'Danny', 'age' => 24],
         ['name' => 'Eddy',  'age' => 18],
     ];
 
@@ -45,6 +45,21 @@ class MultiOperationTest extends TestCase
         ]);
 
         $this->assertIterable(['Benny', 'Cally', 'Danny'], $iter);
+    }
+
+    public function testCanApplyMultipleOperationsUsingPipeFlowAndSwitch()
+    {
+        $year = (int) date('Y');
+
+        $iter = Iter::pipe(Gen::from(self::PEOPLE), [
+            Pipe::map(Func::index('age')),
+            Pipe::reduce('max'),
+            Pipe::switch(function (int $maxAge) use ($year) {
+                return Gen::range($year - $maxAge, $year);
+            }),
+        ]);
+
+        $this->assertIterable(range($year - 24, $year), $iter);
     }
 
     public function testCanApplyMultipleOperationsUsingCollectionFlow()
