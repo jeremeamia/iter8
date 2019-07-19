@@ -98,6 +98,27 @@ Iter::print($iter);
 #> [1, 2, 3, ..., 22, 23, 24]
 ```
 
+### Collection Object
+
+With this usage pattern, the iterable is encapsulated as a `Collection` object. Calling methods on the collection object
+delegate back to the `Iter` class, but the iterable is managed internally. Collections are immutable, so each
+transformation returns a new instance. Also, unlike regular generators, collections can be rewound. Static method calls
+on `Collection` are delegated to `Gen`, so the `Collection` object actually exposes the breadth of Iter8's functionality
+from one interface.
+
+```php
+$collection = Collection::from(PEOPLE)
+    ->filter(Func::compose([
+        Func::index('age'),
+        Func::operator('>=', 20),
+    ]))
+    ->map(Func::index('name'))
+    ->debounce();
+
+$collection->print();
+#> ['Benny', 'Cally', 'Danny']
+```
+
 ## Rewindability
 
 Generators are not rewindable (i.e., calling `rewind()` on them explicitly or trying `foreach` them again will cause an
@@ -129,8 +150,8 @@ iteration. If you rewind or iterate again, then the generating function is re-ex
 
 ### Rewindable Iterator
 
-If you don't control the generating function, then you can retroactively make the iterable rewindable by using the
-`Iter::rewindable()` function.
+If you don't control the generating function or want to avoid re-executing the generator, then you can retroactively
+make the iterable rewindable by using the `Iter::rewindable()` function.
 
 ```php
 $apiResult = $apiClient->getItems();
@@ -150,26 +171,7 @@ foreach ($items as $item) { /* ... */ }
 `Iter::rewindable()` wraps the provided iterable in a `RewindableIterator`, which caches items during the first
 iteration, such that they can be re-emitted in later iterations.
 
-### Collection Object
-
-With this usage pattern, the iterable is encapsulated as a `Collection` object. Calling methods on the collection object
-delegate back to the `Iter` class, but the iterable is managed internally. Collections are immutable, so each
-transformation returns a new instance. Also, unlike regular generators, collections can be rewound. Static method calls
-on `Collection` are delegated to `Gen`, so the `Collection` object actually exposes the breadth of Iter8's functionality
-from one interface.
-
-```php
-$collection = Collection::from(PEOPLE)
-    ->filter(Func::compose([
-        Func::index('age'),
-        Func::operator('>=', 20),
-    ]))
-    ->map(Func::index('name'))
-    ->debounce();
-
-$collection->print();
-#> ['Benny', 'Cally', 'Danny']
-```
+Also, `Collection`s are rewindable be default, since they extend the `RewindableIterator`.
 
 ## Inspiration
 
