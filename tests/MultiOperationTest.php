@@ -52,7 +52,7 @@ class MultiOperationTest extends TestCase
         $year = (int) date('Y');
 
         $iter = Iter::pipe(Gen::from(self::PEOPLE), [
-            Pipe::map(Func::index('age')),
+            Pipe::pluck('age'),
             Pipe::reduce('max'),
             Pipe::switch(function (int $maxAge) use ($year) {
                 return Gen::range($year - $maxAge, $year);

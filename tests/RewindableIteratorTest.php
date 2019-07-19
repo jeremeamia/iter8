@@ -43,6 +43,12 @@ class RewindableIteratorTest extends TestCase
         $this->assertEquals(5, count($iter));
     }
 
+    public function testRewindableIsSeekable()
+    {
+        $iter = Iter::rewindable(Gen::range(1, 5))->seek(2);
+        $this->assertEquals(3, $iter->current());
+    }
+
     /**
      * @param iterable $iterable
      * @dataProvider providesRewindableTestCases
@@ -78,5 +84,35 @@ class RewindableIteratorTest extends TestCase
                 return new ArrayIterator($this->data);
             }
         }];
+    }
+
+    public function testRewindableWithNonFlatGenerator()
+    {
+        $rewindable = Iter::rewindable((function () {
+            yield 1;
+            yield from [2, 3];
+            yield 4;
+            yield from [5];
+        })());
+        $this->assertIterable([1, 2, 3, 4, 5], $rewindable);
+        $this->assertIterable([0, 0, 1, 1, 0], Iter::keys($rewindable));
+    }
+
+    public function testRewindableCanSort()
+    {
+        $rewindable = Iter::rewindable(Gen::range(1, 5));
+        $this->assertIterable([5, 4, 3, 2, 1], $rewindable->sort(function ($a, $b) {
+            return $b <=> $a;
+        }));
+    }
+
+    public function testRewindableCanBeInstantiatedWithAnotherRewindableAndItUsesOthersCache()
+    {
+        $rewindable1 = Iter::rewindable(Gen::range(1, 5));
+        $inner1 = $rewindable1->getInnerIterator();
+        $rewindable2 = Iter::rewindable($rewindable1);
+        $inner2 = $rewindable2->getInnerIterator();
+
+        $this->assertSame($inner1, $inner2);
     }
 }

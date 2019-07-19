@@ -179,6 +179,39 @@ class OperationsTest extends TestCase
             Iter::PRESERVE_KEYS
         ];
 
+        yield 'filterKeys' => [
+            'filterKeys',
+            Iter::toIter(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+            [function (string $key) { return in_array($key, ['a', 'e', 'i', 'o', 'u'], true); }],
+            ['a' => 1, 'e' => 5],
+            Iter::PRESERVE_KEYS
+        ];
+
+        yield 'removeNulls' => [
+            'removeNulls',
+            Iter::toIter([1, 2, null, 3, null, 4]),
+            [],
+            [1, 2, 3, 4]
+        ];
+
+        yield 'removeEmpty' => [
+            'removeEmpty',
+            Iter::toIter([0, 1, 2, null, 3, '', 4]),
+            [],
+            [1, 2, 3, 4]
+        ];
+
+        yield 'where' => [
+            'where',
+            Iter::toIter([
+                ['id' => 'a', 'name' => 'Alice'],
+                ['id' => 'b', 'name' => 'Bob'],
+            ]),
+            ['name', 'Bob'],
+            [1 => ['id' => 'b', 'name' => 'Bob']],
+            Iter::PRESERVE_KEYS
+        ];
+
         yield 'take' => [
             'take',
             Iter::toIter([1, 2, 3, 4, 5]),

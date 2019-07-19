@@ -100,6 +100,7 @@ final class Iter
      * @return Iterator
      * @see array_pluck()
      */
+
     public static function reindex(iterable $iter, callable $fn): Iterator
     {
         foreach ($iter as $key => $value) {
@@ -286,6 +287,15 @@ final class Iter
     /**
      * Creates a new iterable where items are filtered out from the source by applying the filter function to the keys.
      *
+     * Example:
+     *
+     *     $iter = Iter::filterWithKeys(
+     *         ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5],
+     *         function (string $key) { return in_array($key, ['a', 'e', 'i', 'o', 'u'], true); }
+     *     );
+     *     Iter::print($iter);
+     *     #> ['a' => 1, 'e' => 5]
+     *
      * @param iterable $iter Source data.
      * @param callable $fn Filter function (i.e., predicate).
      * @return Iterator
@@ -303,6 +313,12 @@ final class Iter
     /**
      * Creates a new iterable where null items are filtered out from the source.
      *
+     * Example:
+     *
+     *     $iter = Iter::removeNulls([1, 2, null, 3, null, 4]);
+     *     Iter::print($iter);
+     *     #> [1, 2, 3, 4]
+     *
      * @param iterable $iter Source data.
      * @return Iterator
      * @see array_filter()
@@ -314,6 +330,12 @@ final class Iter
 
     /**
      * Creates a new iterable where empty (i.e., falsey) items are filtered out from the source.
+     *
+     * Example:
+     *
+     *     $iter = Iter::removeEmpty([0, 1, 2, null, 3, '', 4]);
+     *     Iter::print($iter);
+     *     #> [1, 2, 3, 4]
      *
      * @param iterable $iter Source data.
      * @return Iterator

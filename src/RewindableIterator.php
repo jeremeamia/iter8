@@ -6,6 +6,7 @@ use ArrayIterator;
 use Countable;
 use Iterator;
 use OuterIterator;
+use SeekableIterator;
 
 /**
  * Wraps an iterator to make it rewindable.
@@ -14,7 +15,7 @@ use OuterIterator;
  * is converted to an iterator where tuples of keys and values are emitted. This allows rewinding iterables whose keys
  * can be duplicates (such as those from yield from).
  */
-class RewindableIterator implements OuterIterator, Countable
+class RewindableIterator implements Countable, OuterIterator, SeekableIterator
 {
     /** @var ArrayIterator|Iterator */
     private $iterator;
@@ -93,5 +94,34 @@ class RewindableIterator implements OuterIterator, Countable
     public function count(): int
     {
         return $this->getInnerIterator()->count();
+    }
+
+    /**
+     * Seek the internal iterator to a position.
+     *
+     * @param int $position
+     * @return static
+     */
+    public function seek($position): self
+    {
+        $this->getInnerIterator()->seek($position);
+
+        return $this;
+    }
+
+    /**
+     * Sort the internal iterator using a the provided comparison function.
+     *
+     * @param callable|null $fn Comparison function. Defaults to a <=> comparison.
+     * @return static
+     */
+    public function sort(?callable $fn = null): self
+    {
+        $fn = $fn ?? Func::operator('<=>');
+        $this->getInnerIterator()->uasort(function (array $tuple1, array $tuple2) use ($fn): int {
+            return $fn($tuple1[1], $tuple2[1]);
+        });
+
+        return $this;
     }
 }

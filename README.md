@@ -87,7 +87,7 @@ max age from the iterable of people, and then switches to a new iterable using t
 
 ```php
 $iter = Iter::pipe(Gen::from(PEOPLE), [
-    Pipe::map(Func::index('age')),
+    Pipe::pluck('age'),
     Pipe::reduce('max'),
     Pipe::switch(function (int $maxAge) {
         return Gen::range(1, $maxAge);
