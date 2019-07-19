@@ -5,9 +5,9 @@ namespace Jeremeamia\Iter8;
 use Iterator;
 
 /**
- * Collection object that encapsulates an iterable and exposes chainable iterable transformation operations.
+ * Collection object that encapsulates an iterable and exposes chainable transformation operations.
  *
- * This class uses __call() and __callStatic() to apply operations from the Iter and Gen classes.
+ * This class uses __call() and __callStatic() to delegate operations to the Iter and Gen classes, respectively.
  *
  * @method static Collection defer(callable $fn, array $args = []) Create a collection using the Gen::defer operation.
  * @method static Collection empty() Create a collection using the Gen::empty operation.
@@ -80,27 +80,50 @@ use Iterator;
  */
 class Collection extends RewindableIterator
 {
+    /**
+     * Delegates the creation of an iterable to the `Gen` class and wraps it in a collection.
+     *
+     * @param string $method Method name available in the Gen class.
+     * @param array $args Method args
+     * @return Collection
+     */
     public static function __callStatic(string $method, array $args)
     {
         return new static(Gen::$method(...$args));
     }
 
+    /**
+     * Delegates an operation on the internal iterable to the `Iter` class.
+     *
+     * If the operation results in a new iterable, it is wrapped in a collection to support method chaining. If the
+     * value is terminal (not an iterable), then it is return as-is.
+     *
+     * @param string $method Method name available in the Iter class.
+     * @param array $args Method args
+     * @return Collection
+     */
     public function __call(string $method, array $args)
     {
         $result = Iter::{$method}($this, ...$args);
 
-        if ($result instanceof Iterator) {
-            $result = new static($result);
-        }
-
-        return $result;
+        return $result instanceof Iterator ? new static($result) : $result;
     }
 
+    /**
+     * Supports use of the object as a string.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return Iter::toString($this);
     }
 
+    /**
+     * Supports use of var_dump() on the object.
+     *
+     * @return array
+     */
     public function __debugInfo(): array
     {
         return ['data' => Iter::toArray($this)];

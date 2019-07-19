@@ -9,7 +9,7 @@ use UnexpectedValueException;
  */
 final class Func
 {
-    public const PLACEHOLDER = "\0_\0";
+    public const PLACEHOLDER = "\0…\0";
 
     /**
      * Creates a callable that will call the specified method (with the specified args) for a provided object.
@@ -302,7 +302,7 @@ final class Func
      *     $iter = $fn([2, 2, 6, 3, 8, 8]);
      *     #> [12, 16]
      *
-     * @param iterable $operations
+     * @param iterable|callable[] $operations List of callables to compose together.
      * @return callable
      */
     public static function compose(iterable $operations): callable
@@ -317,27 +317,36 @@ final class Func
     }
 
     /**
-     * Performs a partial function application of the provided callable to create a unary version of the callable.
+     * Performs a partial function application of the provided callable.
      *
-     * The args list should include the set of fixed args to apply and one instance of the `Func::PLACEHOLDER` constant
-     * to mark where the unary argument should be injected.
+     * The args list should include the set of fixed args and variable arg placeholders (i.e., the `Func::PLACEHOLDER`
+     * constant) to mark where the variable argument should be injected. Any leftover variable arguments are added to
+     * the end of the argument list, such that trailing placeholders are not needed.
      *
      * Example:
      *
-     *     $explodeOnPipe = Func::apply('explode', ['|', Func::PLACEHOLDER]);
+     *     $explodeOnPipe = Func::apply('explode', '|');
      *     $explodeOnPipe('a|b|c');
      *     #> ['a', 'b', 'c']
      *
+     *     $trimAngleBrackets = Func::apply('trim', Func::PLACEHOLDER, '<>');
+     *     $trimAngleBrackets('<foo>');
+     *     #> 'foo'
+     *
      * @param callable $fn
-     * @param array $args
+     * @param array ...$fixedArgs
      * @return callable
      */
-    public static function apply(callable $fn, array $args): callable
+    public static function apply(callable $fn, ...$fixedArgs): callable
     {
-        return function ($unaryArg) use ($fn, $args) {
-            $index = array_search(self::PLACEHOLDER, $args, true);
-            $args[$index] = $unaryArg;
-            return $fn(...$args);
+        return function (...$varArgs) use ($fn, $fixedArgs) {
+            foreach ($fixedArgs as &$arg) {
+                if ($arg === Func::PLACEHOLDER) {
+                    $arg = array_shift($varArgs);
+                }
+            }
+
+            return $fn(...array_merge($fixedArgs, $varArgs));
         };
     }
 

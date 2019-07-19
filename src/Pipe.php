@@ -62,19 +62,30 @@ namespace Jeremeamia\Iter8;
  */
 final class Pipe
 {
+    /**
+     * Creates a pipe-able callables that delegate to the iterable operations in the `Iter` class.
+     *
+     * @param string $method Method name available in the Iter class.
+     * @param array $args Method args
+     * @return callable
+     */
     public static function __callStatic(string $method, array $args)
     {
-        return function ($iter) use (&$method, &$args) {
+        return function ($iter) use ($method, $args) {
             return Iter::{$method}($iter, ...$args);
         };
     }
 
     /**
-     * Creates a pipe-able callable for converting the provided value into an iterable via the provided function.
+     * Creates a pipe-able callable for "switch"-ing the iterable context in the middle of a pipe workflow.
+     *
+     * The provided function is used to convert the value in the current iterable context into a new iterable.
+     *
+     * Warning: The mixture of tap() and switch() can yield unexpected results due to the lazy evaluation of iterables.
      *
      * Example:
      *
-     *     $fn = Pipe::switchMap(function (int $n) { return Gen::range(1, $n); });
+     *     $fn = Pipe::switch(function (int $n) { return Gen::range(1, $n); });
      *     $iter = $fn(3);
      *     #> [1, 2, 3]
      *
@@ -83,7 +94,7 @@ final class Pipe
      */
     public static function switch(callable $fn): callable
     {
-        return function ($value) use (&$fn) {
+        return function ($value) use ($fn) {
             return Gen::from($fn($value));
         };
     }

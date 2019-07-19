@@ -150,11 +150,31 @@ class FuncTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testCanComposeFuncsTogetherInCorrectOrder()
+    {
+        $fns = [
+            function (string $order) { return $order . '1'; },
+            function (string $order) { return $order . '2'; },
+            function (string $order) { return $order . '3'; },
+        ];
+
+        $fn = Func::compose($fns);
+        $result = $fn('');
+        $this->assertEquals('123', $result);
+    }
+
     public function testCanCreatePartiallyAppliedFunc()
     {
-        $fn = Func::apply('explode', ['|', Func::PLACEHOLDER]);
+        $fn = Func::apply('explode', '|');
         $result = $fn('a|b|c');
         $this->assertEquals(['a', 'b', 'c'], $result);
+    }
+
+    public function testCanCreatePartiallyAppliedFuncWithTrailingVariableArgs()
+    {
+        $fn = Func::apply('trim', Func::PLACEHOLDER, '<>');
+        $result = $fn('<foo>');
+        $this->assertEquals('foo', $result);
     }
 
     public function testCanCreateMemoizedFunc()

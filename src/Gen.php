@@ -215,11 +215,10 @@ final class Gen
      */
     public static function fromStream(&$stream, int $bufferSize = 8 * self::KB, ?string $lineEnding = null): Iterator
     {
-        $args = [Func::PLACEHOLDER, $bufferSize, $lineEnding];
-        $read = Func::apply('stream_get_line', $lineEnding ? $args : array_slice($args, 0, 2));
-
         while (!feof($stream)) {
-            $buffer = $read($stream);
+            $buffer = $lineEnding
+                ? stream_get_line($stream, $bufferSize, $lineEnding)
+                : stream_get_line($stream, $bufferSize);
             if ($buffer === false || $buffer === '') {
                 break;
             }
